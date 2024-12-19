@@ -1,8 +1,8 @@
 // backend/src/routes/objectives.js
 const express = require('express');
 const router = express.Router();
-const { Objective } = require('../models/Objective');
-const { requireAuth, requireRole } = require('../middleware/auth');
+const Objective = require('../models/Objective');
+const { requireAuth } = require('../middleware/auth');
 
 // Get all objectives (with filters)
 router.get('/', requireAuth, async (req, res) => {
@@ -25,14 +25,6 @@ router.get('/', requireAuth, async (req, res) => {
       query.department = req.query.department;
     }
 
-    // For individual contributors, only show their objectives and department/org objectives
-    if (req.user.role === 'individual') {
-      query.$or = [
-        { owner: req.user._id },
-        { type: { $in: ['department', 'organization'] } }
-      ];
-    }
-
     const objectives = await Objective.find(query)
       .populate('owner', 'name email')
       .populate('parentObjective', 'title');
@@ -46,14 +38,7 @@ router.get('/', requireAuth, async (req, res) => {
 // Create new objective
 router.post('/', requireAuth, async (req, res) => {
   try {
-    // Validate type permissions
-    if (
-      (req.body.type === 'organization' && req.user.role !== 'admin') ||
-      (req.body.type === 'department' && !['admin', 'manager'].includes(req.user.role))
-    ) {
-      return res.status(403).json({ error: 'Unauthorized to create this type of objective' });
-    }
-
+    console.log('Creating new objective:', req.body);
     const objective = new Objective({
       ...req.body,
       owner: req.user._id
@@ -62,6 +47,7 @@ router.post('/', requireAuth, async (req, res) => {
     await objective.save();
     res.status(201).json(objective);
   } catch (error) {
+    console.error('Error creating objective:', error);
     res.status(400).json({ error: error.message });
   }
 });

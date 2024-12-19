@@ -7,12 +7,14 @@ const User = require('../models/User');
 
 const setupAuth = () => {
   // JWT Strategy
-  passport.use(new JwtStrategy({
+  const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET
-  }, async (payload, done) => {
+  };
+
+  passport.use(new JwtStrategy(jwtOptions, async (jwt_payload, done) => {
     try {
-      const user = await User.findById(payload.id);
+      const user = await User.findById(jwt_payload.id);
       if (user) {
         return done(null, user);
       }
@@ -26,7 +28,7 @@ const setupAuth = () => {
   passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: '/api/auth/github/callback'
+    callbackURL: 'http://localhost:4000/api/auth/github/callback'
   }, async (accessToken, refreshToken, profile, done) => {
     try {
       let user = await User.findOne({ githubId: profile.id });
@@ -41,7 +43,7 @@ const setupAuth = () => {
         githubId: profile.id,
         email: profile.emails?.[0]?.value || `${profile.username}@github.com`,
         name: profile.displayName || profile.username,
-        role: 'individual'  // default role
+        role: 'individual'
       }).save();
       
       done(null, user);
@@ -49,6 +51,21 @@ const setupAuth = () => {
       done(error, false);
     }
   }));
+
+  // Serialize user for the session
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+
+  // Deserialize user from the session
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await User.findById(id);
+      done(null, user);
+    } catch (error) {
+      done(error, null);
+    }
+  });
 };
 
 module.exports = { setupAuth };

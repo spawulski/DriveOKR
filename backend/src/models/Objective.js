@@ -69,4 +69,5 @@ objectiveSchema.methods.calculateProgress = async function() {
   return Math.round(totalProgress / keyResults.length);
 };
 
-module.exports = mongoose.model('Objective', objectiveSchema);
+const Objective = mongoose.model('Objective', objectiveSchema);
+module.exports = Objective;
