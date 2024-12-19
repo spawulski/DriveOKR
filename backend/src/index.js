@@ -15,15 +15,14 @@ const PORT = process.env.PORT || 4000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(passport.initialize());
+app.use(express.urlencoded({ extended: true }));
 
-// Setup
-setupLogging();
-setupAuth();
+// Initialize Passport and restore authentication state if any
+app.use(passport.initialize());
+setupAuth(); // Make sure this is called AFTER passport.initialize()
 
 // Routes
 app.use('/api', routes);
-app.use('/api/auth', require('./routes/auth'));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
@@ -33,7 +32,7 @@ mongoose.connect(process.env.MONGODB_URI)
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  res.status(500).json({ error: err.message });
 });
 
 app.listen(PORT, () => {

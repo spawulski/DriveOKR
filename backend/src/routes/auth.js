@@ -5,11 +5,12 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 // GitHub OAuth routes
-router.get('/github',
+router.get('/github', (req, res, next) => {
+  console.log('GitHub auth route hit');
   passport.authenticate('github', { 
     scope: ['user:email'] 
-  })
-);
+  })(req, res, next);
+});
 
 router.get('/github/callback',
   passport.authenticate('github', { 
