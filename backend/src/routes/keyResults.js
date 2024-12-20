@@ -1,8 +1,8 @@
 // backend/src/routes/keyResults.js
 const express = require('express');
 const router = express.Router();
-const { KeyResult } = require('../models/KeyResult');
-const { Objective } = require('../models/Objective');
+const KeyResult = require('../models/KeyResult');
+const Objective = require('../models/Objective');
 const { requireAuth } = require('../middleware/auth');
 
 // Get key results for an objective
@@ -18,24 +18,26 @@ router.get('/objective/:objectiveId', requireAuth, async (req, res) => {
 // Create key result
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const objective = await Objective.findById(req.body.objective);
+    console.log('Creating key result for objective:', req.body.objective);
     
+    // First verify the objective exists
+    const objective = await Objective.findById(req.body.objective);
     if (!objective) {
       return res.status(404).json({ error: 'Objective not found' });
     }
 
-    // Check permissions
-    if (
-      objective.owner.toString() !== req.user._id.toString() &&
-      req.user.role !== 'admin'
-    ) {
-      return res.status(403).json({ error: 'Unauthorized to add key results to this objective' });
-    }
+    // Create the key result
+    const keyResult = new KeyResult({
+      ...req.body,
+      currentValue: req.body.startValue // Initialize current value to start value
+    });
 
-    const keyResult = new KeyResult(req.body);
     await keyResult.save();
+    console.log('Key result created:', keyResult);
+    
     res.status(201).json(keyResult);
   } catch (error) {
+    console.error('Error creating key result:', error);
     res.status(400).json({ error: error.message });
   }
 });
@@ -49,6 +51,9 @@ router.put('/:id', requireAuth, async (req, res) => {
     }
 
     const objective = await Objective.findById(keyResult.objective);
+    if (!objective) {
+      return res.status(404).json({ error: 'Objective not found' });
+    }
     
     // Check permissions
     if (
@@ -75,6 +80,9 @@ router.patch('/:id/confidence', requireAuth, async (req, res) => {
     }
 
     const objective = await Objective.findById(keyResult.objective);
+    if (!objective) {
+      return res.status(404).json({ error: 'Objective not found' });
+    }
     
     // Check permissions
     if (
@@ -88,25 +96,6 @@ router.patch('/:id/confidence', requireAuth, async (req, res) => {
     res.json(keyResult);
   } catch (error) {
     res.status(400).json({ error: error.message });
-  }
-});
-
-// Get confidence history
-router.get('/:id/confidence-history', requireAuth, async (req, res) => {
-  try {
-    const keyResult = await KeyResult.findById(req.params.id);
-    if (!keyResult) {
-      return res.status(404).json({ error: 'Key Result not found' });
-    }
-
-    const history = keyResult.getConfidenceHistory({
-      from: req.query.from ? new Date(req.query.from) : undefined,
-      to: req.query.to ? new Date(req.query.to) : undefined
-    });
-
-    res.json(history);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
 });
 
