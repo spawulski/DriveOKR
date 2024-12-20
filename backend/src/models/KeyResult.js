@@ -126,3 +126,5 @@ keyResultSchema.methods.updateConfidence = async function(level, note) {
 };
 
 module.exports = mongoose.model('KeyResult', keyResultSchema);
+const KeyResult = mongoose.model('KeyResult', keyResultSchema);
+module.exports = KeyResult;
