@@ -7,14 +7,12 @@ const User = require('../models/User');
 
 const setupAuth = () => {
   // JWT Strategy
-  const jwtOptions = {
+  passport.use(new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET
-  };
-
-  passport.use(new JwtStrategy(jwtOptions, async (jwt_payload, done) => {
+  }, async (payload, done) => {
     try {
-      const user = await User.findById(jwt_payload.id);
+      const user = await User.findById(payload.id);
       if (user) {
         return done(null, user);
       }
@@ -24,7 +22,7 @@ const setupAuth = () => {
     }
   }));
 
-  // GitHub Strategy
+  // GitHub Strategy with error handling
   passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
@@ -34,7 +32,9 @@ const setupAuth = () => {
       let user = await User.findOne({ githubId: profile.id });
       
       if (user) {
+        // Update last login and save new access token if needed
         user.lastLogin = new Date();
+        user.githubAccessToken = accessToken; // Add this field to your User model
         await user.save();
         return done(null, user);
       }
@@ -43,29 +43,34 @@ const setupAuth = () => {
         githubId: profile.id,
         email: profile.emails?.[0]?.value || `${profile.username}@github.com`,
         name: profile.displayName || profile.username,
-        role: 'individual'
+        role: 'individual',
+        githubAccessToken: accessToken
       }).save();
       
       done(null, user);
     } catch (error) {
+      console.error('GitHub auth error:', error);
       done(error, false);
     }
   }));
-
-  // Serialize user for the session
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
-  });
-
-  // Deserialize user from the session
-  passport.deserializeUser(async (id, done) => {
-    try {
-      const user = await User.findById(id);
-      done(null, user);
-    } catch (error) {
-      done(error, null);
-    }
-  });
 };
 
 module.exports = { setupAuth };
+
+//   // Serialize user for the session
+//   passport.serializeUser((user, done) => {
+//     done(null, user.id);
+//   });
+
+//   // Deserialize user from the session
+//   passport.deserializeUser(async (id, done) => {
+//     try {
+//       const user = await User.findById(id);
+//       done(null, user);
+//     } catch (error) {
+//       done(error, null);
+//     }
+//   });
+// };
+
+// module.exports = { setupAuth };
