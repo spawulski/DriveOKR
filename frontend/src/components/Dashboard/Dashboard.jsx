@@ -1,6 +1,7 @@
 // frontend/src/components/Dashboard/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import EditObjectiveForm from '../objectives/EditObjectiveForm';
 import CreateObjectiveForm from '../objectives/CreateObjectiveForm';
 
 const Dashboard = () => {
@@ -13,24 +14,50 @@ const Dashboard = () => {
   });
   const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedObjectiveId, setSelectedObjectiveId] = useState(null);
+
+  const fetchObjectives = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `http://localhost:4000/api/objectives?quarter=${selectedQuarter}&year=${selectedYear}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      setObjectives(response.data);
+    } catch (err) {
+      setError('Failed to fetch objectives');
+      console.error('Error fetching objectives:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchObjectives = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:4000/api/objectives?quarter=${selectedQuarter}&year=${selectedYear}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setObjectives(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to fetch objectives');
-        setLoading(false);
-      }
-    };
-
     fetchObjectives();
   }, [selectedQuarter, selectedYear]);
+
+  const handleEditClick = (objectiveId) => {
+    setSelectedObjectiveId(objectiveId);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditComplete = async (updated = false) => {
+    if (updated) {
+      await fetchObjectives(); // Wait for the fetch to complete
+    }
+    setIsEditModalOpen(false);
+    setSelectedObjectiveId(null);
+  };
+
+  const handleCreateComplete = async (created = false) => {
+    if (created) {
+      await fetchObjectives(); // Wait for the fetch to complete
+    }
+    setIsCreateModalOpen(false);
+  };
 
   if (loading) {
     return (
@@ -40,23 +67,11 @@ const Dashboard = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl text-red-600">{error}</div>
-      </div>
-    );
-  }
-
-  const handleObjectiveCreated = (newObjective) => {
-    setObjectives([...objectives, newObjective]);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">OKR Dashboard</h1>
+          <h1 className="text-3xl font-bold">OKR Dashboard</h1>
           <div className="flex space-x-4">
             <select
               value={selectedQuarter}
@@ -64,9 +79,7 @@ const Dashboard = () => {
               className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             >
               {[1, 2, 3, 4].map((quarter) => (
-                <option key={quarter} value={quarter}>
-                  Q{quarter}
-                </option>
+                <option key={quarter} value={quarter}>Q{quarter}</option>
               ))}
             </select>
             <select
@@ -75,14 +88,12 @@ const Dashboard = () => {
               className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             >
               {[2023, 2024, 2025].map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
+                <option key={year} value={year}>{year}</option>
               ))}
             </select>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Add Objective
             </button>
@@ -102,7 +113,11 @@ const Dashboard = () => {
                       {objective.description}
                     </p>
                     <div className="mt-2 flex items-center text-sm text-gray-500">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        objective.type === 'individual' ? 'bg-blue-100 text-blue-800' :
+                        objective.type === 'department' ? 'bg-green-100 text-green-800' :
+                        'bg-purple-100 text-purple-800'
+                      }`}>
                         {objective.type}
                       </span>
                       <span className="ml-2">
@@ -118,6 +133,7 @@ const Dashboard = () => {
                       />
                     </div>
                     <button
+                      onClick={() => handleEditClick(objective._id)}
                       className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -130,12 +146,24 @@ const Dashboard = () => {
             ))}
           </ul>
         </div>
-        <CreateObjectiveForm
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onObjectiveCreated={handleObjectiveCreated}
-        />
+
+        {error && (
+          <div className="mt-4 text-red-600">
+            {error}
+          </div>
+        )}
       </div>
+
+      <CreateObjectiveForm
+        isOpen={isCreateModalOpen}
+        onClose={handleCreateComplete}
+      />
+
+      <EditObjectiveForm
+        isOpen={isEditModalOpen}
+        onClose={handleEditComplete}
+        objectiveId={selectedObjectiveId}
+      />
     </div>
   );
 };

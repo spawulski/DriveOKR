@@ -50,22 +50,24 @@ router.put('/:id', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Key Result not found' });
     }
 
+    // Check if user has permission through objective ownership
     const objective = await Objective.findById(keyResult.objective);
     if (!objective) {
-      return res.status(404).json({ error: 'Objective not found' });
-    }
-    
-    // Check permissions
-    if (
-      objective.owner.toString() !== req.user._id.toString() &&
-      req.user.role !== 'admin'
-    ) {
-      return res.status(403).json({ error: 'Unauthorized to update this key result' });
+      return res.status(404).json({ error: 'Parent objective not found' });
     }
 
-    Object.assign(keyResult, req.body);
-    await keyResult.save();
-    res.json(keyResult);
+    if (objective.owner.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Not authorized to edit this key result' });
+    }
+
+    // Update the key result
+    const updatedKeyResult = await KeyResult.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updatedAt: new Date() },
+      { new: true, runValidators: true }
+    );
+
+    res.json(updatedKeyResult);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
