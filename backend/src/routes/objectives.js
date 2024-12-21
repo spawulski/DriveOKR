@@ -50,33 +50,40 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// Get all objectives (with filters)
+// backend/src/routes/objectives.js
 router.get('/', requireAuth, async (req, res) => {
   try {
     const query = {};
     
-    // Filter by type
-    if (req.query.type) {
-      query.type = req.query.type;
-    }
-    
-    // Filter by timeframe
     if (req.query.quarter && req.query.year) {
       query['timeframe.quarter'] = parseInt(req.query.quarter);
       query['timeframe.year'] = parseInt(req.query.year);
     }
-    
-    // Filter by department
-    if (req.query.department) {
-      query.department = req.query.department;
-    }
 
     const objectives = await Objective.find(query)
-      .populate('owner', 'name email')
-      .populate('parentObjective', 'title');
+      .populate('owner', 'name email');
 
-    res.json(objectives);
+    // Fetch and process key results for each objective
+    const objectivesWithKRs = await Promise.all(
+      objectives.map(async (objective) => {
+        const keyResults = await KeyResult.find({ objective: objective._id });
+        
+        // Calculate overall objective progress based on KR progress
+        const totalProgress = keyResults.length > 0
+          ? Math.round(keyResults.reduce((sum, kr) => sum + kr.progress, 0) / keyResults.length)
+          : 0;
+
+        return {
+          ...objective.toObject(),
+          progress: totalProgress,
+          keyResults: keyResults.map(kr => kr.toObject()) // This will include the calculated progress
+        };
+      })
+    );
+
+    res.json(objectivesWithKRs);
   } catch (error) {
+    console.error('Error fetching objectives:', error);
     res.status(500).json({ error: error.message });
   }
 });
