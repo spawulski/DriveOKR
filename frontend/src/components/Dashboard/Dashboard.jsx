@@ -102,48 +102,96 @@ const Dashboard = () => {
 
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-gray-200">
-            {objectives.map((objective) => (
-              <li key={objective._id} className="px-6 py-4 hover:bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-medium text-gray-900">
-                      {objective.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {objective.description}
-                    </p>
-                    <div className="mt-2 flex items-center text-sm text-gray-500">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        objective.type === 'individual' ? 'bg-blue-100 text-blue-800' :
-                        objective.type === 'department' ? 'bg-green-100 text-green-800' :
-                        'bg-purple-100 text-purple-800'
-                      }`}>
-                        {objective.type}
-                      </span>
-                      <span className="ml-2">
-                        Progress: {objective.progress}%
-                      </span>
-                    </div>
+          {objectives.map((objective) => (
+            <li key={objective._id} className="px-6 py-4 hover:bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {objective.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {objective.description}
+                  </p>
+                  <div className="mt-2 flex items-center text-sm text-gray-500">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      objective.type === 'individual' ? 'bg-blue-100 text-blue-800' :
+                      objective.type === 'department' ? 'bg-green-100 text-green-800' :
+                      'bg-purple-100 text-purple-800'
+                    }`}>
+                      {objective.type}
+                    </span>
+                    <span className="ml-2">
+                      Progress: {objective.progress}%
+                    </span>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-indigo-600 rounded-full"
-                        style={{ width: `${objective.progress}%` }}
-                      />
+
+                  {/* Key Results Section */}
+                  {objective.keyResults && objective.keyResults.length > 0 && (
+                    <div className="mt-4 space-y-2">
+                      {objective.keyResults.map((kr) => {
+                        // Calculate progress here as backup
+                        const progress = kr.progress || (() => {
+                          if (kr.currentValue >= kr.targetValue) return 100;
+                          if (kr.currentValue <= kr.startValue) return 0;
+                          const total = kr.targetValue - kr.startValue;
+                          const current = kr.currentValue - kr.startValue;
+                          return Math.min(100, Math.max(0, Math.round((current / total) * 100)));
+                        })();
+
+                        return (
+                          <div key={kr._id} className="flex items-center space-x-4">
+                            <div className="flex-1">
+                              <div className="flex justify-between items-center text-sm">
+                                <span className="font-medium">{kr.title}</span>
+                                <div className="flex items-center space-x-2">
+                                  <span className={`px-2 py-0.5 rounded text-xs ${
+                                    kr.confidenceLevel === 'high' ? 'bg-green-100 text-green-800' :
+                                    kr.confidenceLevel === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-red-100 text-red-800'
+                                  }`}>
+                                    {kr.confidenceLevel}
+                                  </span>
+                                  <span className="text-gray-500 min-w-[8rem] text-right">
+                                    {kr.currentValue} / {kr.targetValue} {kr.unit}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="mt-1 flex items-center space-x-2">
+                                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full transition-all duration-500 ${
+                                      progress >= 75 ? 'bg-green-500' :
+                                      progress >= 50 ? 'bg-yellow-500' :
+                                      'bg-red-500'
+                                    }`}
+                                    style={{ width: `${progress}%` }}
+                                  />
+                                </div>
+                                <span className="text-xs text-gray-500 min-w-[3rem] text-right">
+                                  {progress}%
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <button
-                      onClick={() => handleEditClick(objective._id)}
-                      className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg>
-                    </button>
-                  </div>
+                  )}
                 </div>
-              </li>
-            ))}
+
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => handleEditClick(objective._id)}
+                    className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
           </ul>
         </div>
 
