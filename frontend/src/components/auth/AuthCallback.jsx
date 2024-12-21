@@ -7,21 +7,22 @@ const AuthCallback = () => {
   const location = useLocation();
   
   useEffect(() => {
-    console.log('AuthCallback mounted');
-    console.log('Current location:', location);
-    
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
+    const error = params.get('error');
     
-    console.log('Received token:', token);
-    
+    if (error) {
+      console.error('Auth error:', error);
+      navigate('/login');
+      return;
+    }
+
     if (token) {
-      console.log('Storing token and redirecting to dashboard');
       localStorage.setItem('token', token);
-      navigate('/dashboard', { replace: true });
+      navigate('/dashboard');
     } else {
-      console.log('No token found, redirecting to login');
-      navigate('/login', { replace: true });
+      console.error('No token received');
+      navigate('/login');
     }
   }, [navigate, location]);
 
