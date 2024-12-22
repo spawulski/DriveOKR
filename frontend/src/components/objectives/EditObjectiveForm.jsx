@@ -14,6 +14,17 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
     }
   });
 
+  const emptyKeyResult = {
+    title: '',
+    description: '',
+    metricType: 'number',
+    startValue: 0,
+    targetValue: 0,
+    currentValue: 0,
+    unit: '',
+    confidenceLevel: 'medium'
+  };
+
   const [keyResults, setKeyResults] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -54,6 +65,11 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
     }
   }, [isOpen, objectiveId]);
 
+  // Add a function to handle adding new key results
+  const handleAddKeyResult = () => {
+    setKeyResults([...keyResults, emptyKeyResult]);
+  };
+
   const handleKeyResultChange = (index, field, value) => {
     const updatedKeyResults = [...keyResults];
     updatedKeyResults[index] = {
@@ -67,7 +83,7 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
+  
     try {
       const token = localStorage.getItem('token');
       
@@ -79,18 +95,33 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-
-      // Update key results
-      const keyResultPromises = keyResults.map(kr =>
-        axios.put(
-          `http://localhost:4000/api/key-results/${kr._id}`,
-          kr,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        )
-      );
-
+  
+      // Update or create key results
+      const keyResultPromises = keyResults.map(kr => {
+        if (kr._id) {
+          // Existing key result - update it
+          return axios.put(
+            `http://localhost:4000/api/key-results/${kr._id}`,
+            kr,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+        } else {
+          // New key result - create it
+          return axios.post(
+            `http://localhost:4000/api/key-results`,
+            {
+              ...kr,
+              objective: objectiveId
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+        }
+      });
+  
       await Promise.all(keyResultPromises);
       onClose(true); // Pass true to indicate successful update
     } catch (err) {
@@ -345,7 +376,19 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
               </div>
             ))}
           </div>
-
+          {/* In your form JSX, after the existing key results mapping, add: */}
+          <div className="flex justify-center pt-4">
+            <button
+              type="button"
+              onClick={handleAddKeyResult}
+              className="inline-flex items-center px-4 py-2 border border-indigo-500 text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add Key Result
+            </button>
+          </div>
           {error && (
             <div className="text-red-600 text-sm mt-2">
               {error}

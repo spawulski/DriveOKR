@@ -76,16 +76,43 @@ const keyResultSchema = new mongoose.Schema({
 
 // Validate confidence level based on progress and status
 keyResultSchema.pre('save', async function(next) {
-  // Calculate progress
-  if (this.currentValue === this.targetValue) {
-    this.progress = 100;
-  } else if (this.currentValue <= this.startValue) {
-    this.progress = 0;
-  } else {
-    const totalDifference = this.targetValue - this.startValue;
-    const currentDifference = this.currentValue - this.startValue;
-    this.progress = Math.round((currentDifference / totalDifference) * 100);
-  }
+ // Calculate progress
+ const totalRange = this.targetValue - this.startValue;
+ const currentProgress = this.currentValue - this.startValue;
+ 
+ if (totalRange > 0) {
+   this.progress = Math.round((currentProgress / totalRange) * 100);
+ } else {
+   this.progress = this.currentValue >= this.targetValue ? 100 : 0;
+ }
+
+ console.log('Progress calculation:', {
+   title: this.title,
+   currentValue: this.currentValue,
+   targetValue: this.targetValue,
+   startValue: this.startValue,
+   calculatedProgress: this.progress
+ });
+
+ // Update status based on progress and confidence
+ if (this.currentValue >= this.targetValue) {
+   this.status = 'completed';
+ } else if (this.progress >= 75 && this.confidenceLevel === 'high') {
+   this.status = 'on_track';
+ } else if (this.progress < 25 || this.confidenceLevel === 'low') {
+   this.status = 'at_risk';
+ } else if (this.progress < 50 && this.confidenceLevel !== 'high') {
+   this.status = 'behind';
+ } else {
+   this.status = 'on_track';
+ }
+
+ console.log('Status update:', {
+   title: this.title,
+   progress: this.progress,
+   confidenceLevel: this.confidenceLevel,
+   status: this.status
+ });
 
   // Track confidence changes
   if (this.isModified('confidenceLevel')) {
@@ -93,17 +120,6 @@ keyResultSchema.pre('save', async function(next) {
       level: this.confidenceLevel,
       timestamp: new Date()
     });
-  }
-
-  // Auto-update status based on progress and confidence
-  if (this.progress >= 75 && this.confidenceLevel === 'high') {
-    this.status = 'on_track';
-  } else if (this.progress < 25 || this.confidenceLevel === 'low') {
-    this.status = 'at_risk';
-  } else if (this.progress === 100) {
-    this.status = 'completed';
-  } else if (this.progress < 50 && this.confidenceLevel !== 'high') {
-    this.status = 'behind';
   }
 
   next();

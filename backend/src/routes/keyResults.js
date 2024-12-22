@@ -60,15 +60,29 @@ router.put('/:id', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Not authorized to edit this key result' });
     }
 
-    // Update the key result
-    const updatedKeyResult = await KeyResult.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body, updatedAt: new Date() },
-      { new: true, runValidators: true }
-    );
+    // Update the key result fields
+    Object.assign(keyResult, {
+      ...req.body,
+      updatedAt: new Date()
+    });
+
+    // Save the key result (this will trigger the pre-save hooks)
+    await keyResult.save();
+
+    // Fetch the fresh document to ensure we have all calculated fields
+    const updatedKeyResult = await KeyResult.findById(req.params.id);
+    
+    console.log('Updated Key Result:', {
+      title: updatedKeyResult.title,
+      progress: updatedKeyResult.progress,
+      status: updatedKeyResult.status,
+      currentValue: updatedKeyResult.currentValue,
+      targetValue: updatedKeyResult.targetValue
+    });
 
     res.json(updatedKeyResult);
   } catch (error) {
+    console.error('Error updating key result:', error);
     res.status(400).json({ error: error.message });
   }
 });
