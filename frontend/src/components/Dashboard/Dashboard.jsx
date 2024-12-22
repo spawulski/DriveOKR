@@ -129,6 +129,7 @@ const Dashboard = () => {
                   {objective.keyResults && objective.keyResults.length > 0 && (
                     <div className="mt-4 space-y-2">
                       {objective.keyResults.map((kr) => {
+                        
                         // Calculate progress here as backup
                         const progress = kr.progress || (() => {
                           if (kr.currentValue >= kr.targetValue) return 100;
@@ -136,7 +137,17 @@ const Dashboard = () => {
                           const total = kr.targetValue - kr.startValue;
                           const current = kr.currentValue - kr.startValue;
                           return Math.min(100, Math.max(0, Math.round((current / total) * 100)));
-                        })();
+                        })()
+                        
+                        console.log('Rendering key result:', {
+                          title: kr.title,
+                          status: kr.status,
+                          progress: kr.progress,
+                          confidenceLevel: kr.confidenceLevel,
+                          currentValue: kr.currentValue,
+                          targetValue: kr.targetValue,
+                          startValue: kr.startValue
+                        });
 
                         return (
                           <div key={kr._id} className="flex items-center space-x-4">
@@ -171,6 +182,20 @@ const Dashboard = () => {
                                   {progress}%
                                 </span>
                               </div>
+                              <span className="text-xs">Status:</span>
+                              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
+                                kr.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                kr.status === 'on_track' ? 'bg-blue-100 text-blue-800' :
+                                kr.status === 'at_risk' ? 'bg-yellow-100 text-yellow-800' :
+                                kr.status === 'behind' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {kr.status === 'completed' ? 'Completed' :
+                                kr.status === 'on_track' ? 'On Track' :
+                                kr.status === 'at_risk' ? 'At Risk' :
+                                kr.status === 'behind' ? 'Behind' :
+                                'Unknown'}
+                              </span>
                             </div>
                           </div>
                         );
