@@ -53,11 +53,11 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
+  
     try {
       const token = localStorage.getItem('token');
       
-      // First create the objective
+      // Create objective
       const objectiveResponse = await axios.post(
         'http://localhost:4000/api/objectives',
         formData,
@@ -65,61 +65,26 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-
-      console.log('Created objective:', objectiveResponse.data);
-      const objectiveId = objectiveResponse.data._id;
-
-      // Then create all key results
-      const keyResultPromises = keyResults.map(kr => {
-        // Validate required fields
-        if (!kr.title || !kr.metricType || kr.startValue === undefined || kr.targetValue === undefined) {
-          throw new Error('Please fill in all required fields for each Key Result');
-        }
-
-        console.log('Creating key result:', {
-          ...kr,
-          objective: objectiveId,
-          currentValue: kr.startValue
-        });
-
-        return axios.post(
+  
+      // Create key results
+      const keyResultPromises = keyResults.map(kr =>
+        axios.post(
           'http://localhost:4000/api/key-results',
           {
             ...kr,
-            objective: objectiveId,
+            objective: objectiveResponse.data._id,
             currentValue: kr.startValue
           },
           {
             headers: { Authorization: `Bearer ${token}` }
           }
-        );
-      });
-
-      try {
-        await Promise.all(keyResultPromises);
-      } catch (err) {
-        console.error('Error creating key results:', err);
-        throw err;
-      }
-
-      onObjectiveCreated(objectiveResponse.data);
-      onClose();
-      
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        type: 'individual',
-        department: '',
-        timeframe: {
-          quarter: getCurrentQuarter(),
-          year: new Date().getFullYear()
-        }
-      });
-      setKeyResults([]);
+        )
+      );
+  
+      await Promise.all(keyResultPromises);
+      onClose(true); // Pass boolean instead of object
     } catch (err) {
-      console.error('Form submission error:', err);
-      setError(err.response?.data?.error || err.message || 'Failed to create objective');
+      setError(err.response?.data?.error || 'Failed to create objective');
     } finally {
       setLoading(false);
     }
