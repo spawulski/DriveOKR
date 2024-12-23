@@ -132,28 +132,30 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// Delete objective
+// backend/src/routes/objectives.js
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const objective = await Objective.findById(req.params.id);
-    
     if (!objective) {
       return res.status(404).json({ error: 'Objective not found' });
     }
-
-    // Check delete permissions
-    if (
-      objective.owner.toString() !== req.user._id.toString() &&
-      req.user.role !== 'admin'
-    ) {
-      return res.status(403).json({ error: 'Unauthorized to delete this objective' });
+ 
+    // Check if user owns this objective
+    if (objective.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Not authorized to delete this objective' });
     }
-
-    await objective.remove();
-    res.json({ message: 'Objective deleted' });
+ 
+    // Delete associated key results
+    await KeyResult.deleteMany({ objective: objective._id });
+    
+    // Delete objective
+    await Objective.findByIdAndDelete(objective._id);
+    
+    res.json({ message: 'Objective and key results deleted' });
   } catch (error) {
+    console.error('Delete error:', error);
     res.status(500).json({ error: error.message });
   }
-});
+ });
 
 module.exports = router;
