@@ -273,12 +273,13 @@ const Dashboard = () => {
 
           <CreateObjectiveForm
             isOpen={isCreateModalOpen}
-            onClose={(created) => {
-              if (created) {
-                fetchObjectives();
-              }
-              setIsCreateModalOpen(false);
-            }}
+            onClose={handleCreateComplete}
+            // onClose={(created) => {
+            //   if (created) {
+            //     fetchObjectives();
+            //   }
+            //   setIsCreateModalOpen(false);
+            // }}
           />
 
           <EditObjectiveForm
