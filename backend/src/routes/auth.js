@@ -63,7 +63,8 @@ router.get('/verify',
         email: req.user.email,
         name: req.user.name,
         role: req.user.role,
-        department: req.user.department
+        department: req.user.department,
+        isAdmin: req.user.isAdmin  // Add this line
       }
     });
   }

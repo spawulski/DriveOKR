@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
     enum: ['individual', 'manager', 'admin'],
     default: 'individual'
   },
+  isAdmin: {  // Explicit admin flag for clearer permissions
+    type: Boolean,
+    default: false
+  },
   department: { 
     type: String 
   },
@@ -33,5 +37,10 @@ const userSchema = new mongoose.Schema({
     type: Date 
   }
 });
+
+// Helper method to check if user is admin
+userSchema.methods.isUserAdmin = function() {
+  return this.isAdmin === true;
+};
 
 module.exports = mongoose.model('User', userSchema);
