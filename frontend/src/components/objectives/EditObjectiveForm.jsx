@@ -89,10 +89,11 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
   };
 
   const handleKeyResultChange = (index, field, value) => {
+    console.log('Updating key result:', { index, field, value }); // Debug log
     const updatedKeyResults = [...keyResults];
     updatedKeyResults[index] = {
       ...updatedKeyResults[index],
-      [field]: value
+      [field]: field === 'currentValue' ? Number(value) : value // Ensure currentValue is a number
     };
     setKeyResults(updatedKeyResults);
   };
@@ -133,6 +134,8 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
   
       // Update or create key results
       const keyResultPromises = keyResults.map(kr => {
+        console.log('Processing key result:', kr); // Debug log
+
         if (kr._id) {
           // Existing key result - update it
           return axios.put(
