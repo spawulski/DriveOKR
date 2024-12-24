@@ -29,7 +29,7 @@ router.post('/', requireAuth, async (req, res) => {
     // Create the key result
     const keyResult = new KeyResult({
       ...req.body,
-      currentValue: req.body.startValue // Initialize current value to start value
+      currentValue: req.body.currentValue || req.body.startValue // Ensure currentValue is set
     });
 
     await keyResult.save();
