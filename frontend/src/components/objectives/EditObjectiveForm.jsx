@@ -28,8 +28,26 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
   const [keyResults, setKeyResults] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:4000/api/auth/verify', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCurrentUser(response.data.user);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    
     const fetchOKR = async () => {
       if (!objectiveId) return;
       setLoading(true);
@@ -77,6 +95,23 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
       [field]: value
     };
     setKeyResults(updatedKeyResults);
+  };
+
+  const handleDeleteKeyResult = async (keyResultId) => {
+    if (!window.confirm('Are you sure you want to delete this key result?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:4000/api/key-results/${keyResultId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Update local state to remove the deleted key result
+      setKeyResults(keyResults.filter(kr => kr._id !== keyResultId));
+    } catch (error) {
+      console.error('Error deleting key result:', error);
+      setError('Failed to delete key result');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -258,8 +293,18 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
             <h3 className="text-lg font-medium">Key Results</h3>
             {keyResults.map((kr, index) => (
               <div key={kr._id || index} className="p-4 border rounded-md relative">
-                <h4 className="text-md font-medium mb-4">Key Result #{index + 1}</h4>
-
+                <h4 className="text-md font-medium">Key Result #{index + 1}</h4>
+                {currentUser?.isAdmin && kr._id && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteKeyResult(kr._id)}
+                    className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                )}
                 <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">

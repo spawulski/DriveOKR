@@ -87,6 +87,24 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
+// backend/src/routes/keyResults.js
+router.delete('/:id', requireAuth, async (req, res) => {
+  try {
+    const keyResult = await KeyResult.findById(req.params.id);
+    if (!keyResult) {
+      return res.status(404).json({ error: 'Key Result not found' });
+    }
+
+    // Delete the key result
+    await KeyResult.findByIdAndDelete(keyResult._id);
+    
+    res.json({ message: 'Key Result deleted successfully' });
+  } catch (error) {
+    console.error('Delete key result error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update confidence level
 router.patch('/:id/confidence', requireAuth, async (req, res) => {
   try {
