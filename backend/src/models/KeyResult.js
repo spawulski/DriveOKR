@@ -61,6 +61,16 @@ const keyResultSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
+  progressHistory: [{
+    value: {
+      type: Number,
+      required: true
+    },
+    date: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   unit: {
     type: String,
     required: false
@@ -119,6 +129,14 @@ keyResultSchema.pre('save', async function(next) {
     this.confidenceHistory.push({
       level: this.confidenceLevel,
       timestamp: new Date()
+    });
+  }
+
+  // Add to progress history if currentValue changed
+  if (this.isModified('currentValue')) {
+    this.progressHistory.push({
+      value: this.currentValue,
+      date: new Date()
     });
   }
 

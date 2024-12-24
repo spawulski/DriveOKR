@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import EditObjectiveForm from '../objectives/EditObjectiveForm';
 import CreateObjectiveForm from '../objectives/CreateObjectiveForm';
+import ProgressChart from '../charts/ProgressChart';
 import Sidebar from '../Navigation/Sidebar';
 
 const Dashboard = () => {
@@ -20,6 +21,7 @@ const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedView, setSelectedView] = useState({ type: 'organization' });
+  const [expandedCards, setExpandedCards] = useState({});
 
   const fetchObjectives = async () => {
     try {
@@ -90,6 +92,13 @@ const Dashboard = () => {
     setIsCreateModalOpen(false);
   };
 
+  const toggleCard = (objectiveId) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [objectiveId]: !prev[objectiveId]
+    }));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -155,10 +164,22 @@ const Dashboard = () => {
               <ul className="divide-y divide-gray-200">
               {objectives.map((objective) => (
                 <li key={objective._id} className="px-6 py-4 hover:bg-gray-50">
+                  <div 
+                    className="cursor-pointer"
+                    onClick={() => toggleCard(objective._id)}
+                  >
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-medium text-gray-900">
+                      <h3 className="text-lg font-medium text-gray-900 flex items-center">
                         {objective.title}
+                        <svg 
+                          className={`ml-2 h-5 w-5 transform transition-transform ${expandedCards[objective._id] ? 'rotate-180' : ''}`} 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">
                         {objective.description}
@@ -254,6 +275,7 @@ const Dashboard = () => {
                         </div>
                       )}
                     </div>
+                    
                     <div className="p-4 flex flex-col items-center space-y-4">
                       <button
                         onClick={() => handleEditClick(objective._id)}
@@ -274,6 +296,21 @@ const Dashboard = () => {
                         </button>                 
                       )}
                     </div>
+                    </div>
+                    {/* Expanded content */}
+                    {expandedCards[objective._id] && (
+                      <div className="mt-4 space-y-4 pl-4">
+                        {objective.keyResults.map((kr) => (
+                          <div key={kr._id} className="border rounded-lg p-4">
+                            <h4 className="font-medium mb-2">{kr.title}</h4>
+                            <div className="text-sm text-gray-500 mb-4">
+                              Current: {kr.currentValue} / {kr.targetValue} {kr.unit}
+                            </div>
+                            <ProgressChart keyResult={kr} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </li>
               ))}
