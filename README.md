@@ -149,6 +149,14 @@ PUT /api/key-results/:id
 PATCH /api/key-results/:id/confidence
 ```
 
+### How to make a user an Admin
+```
+docker ps
+docker exec -it <container_id> bash
+mongosh
+use okr_platform
+db.users.updateOne({email: "user@email.com"},{$set: {isAdmin: true}})
+```
 ## Contributing
 
 1. Fork the repository
@@ -169,6 +177,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Contact
 
-Your Name - [@yourtwitter](https://twitter.com/spawulski) - email@example.com
+Stephen Pawulski - [@spops.bsky.social](https://twitter.com/spawulski) - spawulski@gmail.com
 
 Project Link: [https://github.com/spawulski/drive-okr](https://github.com/spawulski/drive-okr)
