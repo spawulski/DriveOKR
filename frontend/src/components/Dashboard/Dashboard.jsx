@@ -5,6 +5,7 @@ import EditObjectiveForm from '../objectives/EditObjectiveForm';
 import CreateObjectiveForm from '../objectives/CreateObjectiveForm';
 import ProgressChart from '../charts/ProgressChart';
 import Sidebar from '../Navigation/Sidebar';
+import Collapse from '../common/Collapse';
 
 const Dashboard = () => {
   const [objectives, setObjectives] = useState([]);
@@ -299,17 +300,19 @@ const Dashboard = () => {
                     </div>
                     {/* Expanded content */}
                     {expandedCards[objective._id] && (
-                      <div className="mt-4 space-y-4 pl-4">
-                        {objective.keyResults.map((kr) => (
-                          <div key={kr._id} className="border rounded-lg p-4">
-                            <h4 className="font-medium mb-2">{kr.title}</h4>
-                            <div className="text-sm text-gray-500 mb-4">
-                              Current: {kr.currentValue} / {kr.targetValue} {kr.unit}
+                      <Collapse isOpen={expandedCards[objective._id]}>
+                        <div className="mt-4 space-y-4 pl-4">
+                          {objective.keyResults.map((kr) => (
+                            <div key={kr._id} className="border rounded-lg p-4">
+                              <h4 className="font-medium mb-2">{kr.title}</h4>
+                              <div className="text-sm text-gray-500 mb-4">
+                                Current: {kr.currentValue} / {kr.targetValue} {kr.unit}
+                              </div>
+                              <ProgressChart keyResult={kr} />
                             </div>
-                            <ProgressChart keyResult={kr} />
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      </Collapse>
                     )}
                   </div>
                 </li>
