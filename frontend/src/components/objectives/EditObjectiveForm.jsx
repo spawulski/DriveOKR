@@ -295,13 +295,13 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Key Results</h3>
             {keyResults.map((kr, index) => (
-              <div key={kr._id || index} className="p-4 border rounded-md relative">
+              <div key={kr._id || index} className="p-4 border rounded-md relative ">
                 <h4 className="text-md font-medium">Key Result #{index + 1}</h4>
                 {currentUser?.isAdmin && kr._id && (
                   <button
                     type="button"
                     onClick={() => handleDeleteKeyResult(kr._id)}
-                    className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    className="inline-flex items-center p-1 border border-transparent rounded-full absolute top-4 right-4 inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
