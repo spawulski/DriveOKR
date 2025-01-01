@@ -14,17 +14,16 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
+  department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
+  team: { type: mongoose.Schema.Types.ObjectId, ref: 'Team' },
   role: {
     type: String,
-    enum: ['individual', 'manager', 'admin'],
+    enum: ['individual', 'team_lead', 'manager', 'admin'],
     default: 'individual'
   },
   isAdmin: {  // Explicit admin flag for clearer permissions
     type: Boolean,
     default: false
-  },
-  department: { 
-    type: String 
   },
   githubAccessToken: { 
     type: String 
