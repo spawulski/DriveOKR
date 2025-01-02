@@ -6,6 +6,9 @@ import { useAuth } from '../../contexts/AuthContext';
 const Header = () => {
   const { user } = useAuth();
 
+  console.log('Header - Current user:', user);  // Add this
+  console.log('Is admin?', user?.isAdmin);      // Add this
+
   return (
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

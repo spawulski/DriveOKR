@@ -9,6 +9,9 @@ const User = require('../models/User');
 const Department = require('../models/Department');
 const Team = require('../models/Team');
 const Objective = require('../models/Objective');
+const departmentRoutes = require('./department');  // Add these
+const teamRoutes = require('./team');             // new routes
+const userRoutes = require('./users');  
 
 // Add admin middleware
 const requireAdmin = (req, res, next) => {
@@ -23,6 +26,9 @@ router.use('/auth', authRoutes);
 router.use('/objectives', objectiveRoutes);
 router.use('/key-results', keyResultRoutes);
 router.use('/admin/*', requireAuth, requireAdmin);
+router.use('/departments', departmentRoutes);      // Add these
+router.use('/teams', teamRoutes);                 // new route
+router.use('/users', userRoutes);    
 
 // Health check route
 router.get('/health', (req, res) => {
