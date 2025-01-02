@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import EditObjectiveForm from '../objectives/EditObjectiveForm';
+import Header from '../Navigation/Header';
 import CreateObjectiveForm from '../objectives/CreateObjectiveForm';
 import ProgressChart from '../charts/ProgressChart';
 import Sidebar from '../Navigation/Sidebar';
@@ -110,6 +111,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
     {/* Sidebar Toggle Button */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
