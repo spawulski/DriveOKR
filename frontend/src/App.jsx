@@ -3,15 +3,30 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/auth/LoginPage';
 import AuthCallback from './components/auth/AuthCallback';
 import Dashboard from './components/Dashboard/Dashboard';
+import AdminDashboard from './components/admin/AdminDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user || !user.isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+};
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   
-  console.log('ProtectedRoute - user:', user);
-  console.log('ProtectedRoute - loading:', loading);
-  
-  // Always show loading state when loading is true
   if (loading === true) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -20,12 +35,23 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Check for valid token in localStorage even if no user
   const token = localStorage.getItem('token');
   if (!user && !token) {
     return <Navigate to="/login" replace />;
   }
   
+  return children;
+};
+
+// Add PublicRoute to prevent authenticated users from accessing login
+const PublicRoute = ({ children }) => {
+  const { user } = useAuth();
+  const token = localStorage.getItem('token');
+
+  if (user || token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return children;
 };
 
@@ -51,23 +77,19 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/*"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
   );
 }
-
-// Add PublicRoute to prevent authenticated users from accessing login
-const PublicRoute = ({ children }) => {
-  const { user } = useAuth();
-  const token = localStorage.getItem('token');
-
-  if (user || token) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-};
 
 export default App;
