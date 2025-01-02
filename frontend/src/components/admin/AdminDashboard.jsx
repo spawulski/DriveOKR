@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Users, Building2, Target, TrendingUp, UserCheck, AlertTriangle } from 'lucide-react';
+import DepartmentManager from './DepartmentManager';
+import TeamManager from './TeamManager';
 import axios from 'axios';
 
 const AdminDashboard = () => {
@@ -175,8 +177,13 @@ const AdminDashboard = () => {
   );
 };
 
-// Analytics Tab Component
 const AnalyticsTab = () => {
+  const [analyticsData, setAnalyticsData] = useState([]);
+
+  useEffect(() => {
+    // Fetch analytics data here
+  }, []);
+
   return (
     <div className="space-y-6">
       <Card>
@@ -185,7 +192,7 @@ const AnalyticsTab = () => {
         </CardHeader>
         <CardContent className="h-96">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={sampleData}>
+            <LineChart data={analyticsData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
@@ -195,17 +202,60 @@ const AnalyticsTab = () => {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-
-      {/* Add more analytics components */}
     </div>
   );
 };
 
-// User Management Tab Component
 const UserManagementTab = () => {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:4000/api/users', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   return (
     <div className="space-y-6">
-      {/* Add user management components */}
+      <Card>
+        <CardHeader>
+          <CardTitle>User Management</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="divide-y">
+            {users.map(user => (
+              <div key={user._id} className="py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium">{user.name}</h3>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span className="px-2 py-1 text-xs rounded-full bg-gray-100">
+                      {user.role}
+                    </span>
+                    {user.isAdmin && (
+                      <span className="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
+                        Admin
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
