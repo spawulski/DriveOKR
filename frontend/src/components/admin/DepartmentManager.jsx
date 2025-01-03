@@ -118,6 +118,7 @@ const DepartmentManager = () => {
                  <p className="text-sm text-gray-500">{department.description}</p>
                </div>
                <div className="flex items-center space-x-4">
+                Manager: 
                  <select
                    value={department.manager?._id || ''}
                    onChange={(e) => handleUpdateManager(department._id, e.target.value)}

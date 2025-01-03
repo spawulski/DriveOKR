@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Users, Building2, Target, TrendingUp, UserCheck, AlertTriangle } from 'lucide-react';
 import DepartmentManager from './DepartmentManager';
 import TeamManager from './TeamManager';
+import UserManagementTab from './UserManagementTab';
 import axios from 'axios';
 
 const AdminDashboard = () => {
@@ -206,58 +207,58 @@ const AnalyticsTab = () => {
   );
 };
 
-const UserManagementTab = () => {
-  const [users, setUsers] = useState([]);
+// const UserManagementTab = () => {
+//   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:4000/api/users', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setUsers(response.data);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
+//   useEffect(() => {
+//     const fetchUsers = async () => {
+//       try {
+//         const token = localStorage.getItem('token');
+//         const response = await axios.get('http://localhost:4000/api/users', {
+//           headers: { Authorization: `Bearer ${token}` }
+//         });
+//         setUsers(response.data);
+//       } catch (error) {
+//         console.error('Error fetching users:', error);
+//       }
+//     };
 
-    fetchUsers();
-  }, []);
+//     fetchUsers();
+//   }, []);
 
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>User Management</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="divide-y">
-            {users.map(user => (
-              <div key={user._id} className="py-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-medium">{user.name}</h3>
-                    <p className="text-sm text-gray-500">{user.email}</p>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <span className="px-2 py-1 text-xs rounded-full bg-gray-100">
-                      {user.role}
-                    </span>
-                    {user.isAdmin && (
-                      <span className="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
-                        Admin
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
+//   return (
+//     <div className="space-y-6">
+//       <Card>
+//         <CardHeader>
+//           <CardTitle>User Management</CardTitle>
+//         </CardHeader>
+//         <CardContent>
+//           <div className="divide-y">
+//             {users.map(user => (
+//               <div key={user._id} className="py-4">
+//                 <div className="flex items-center justify-between">
+//                   <div>
+//                     <h3 className="text-lg font-medium">{user.name}</h3>
+//                     <p className="text-sm text-gray-500">{user.email}</p>
+//                   </div>
+//                   <div className="flex items-center space-x-4">
+//                     <span className="px-2 py-1 text-xs rounded-full bg-gray-100">
+//                       {user.role}
+//                     </span>
+//                     {user.isAdmin && (
+//                       <span className="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
+//                         Admin
+//                       </span>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </CardContent>
+//       </Card>
+//     </div>
+//   );
+// };
 
 export default AdminDashboard;
