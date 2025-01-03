@@ -29,6 +29,7 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -46,8 +47,7 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
     fetchCurrentUser();
   }, []);
 
-  useEffect(() => {
-    
+  useEffect(() => {    
     const fetchOKR = async () => {
       if (!objectiveId) return;
       setLoading(true);
@@ -80,6 +80,45 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
 
     if (isOpen && objectiveId) {
       fetchOKR();
+    }
+  }, [isOpen, objectiveId]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!objectiveId) return;
+      setLoading(true);
+      
+      try {
+        const token = localStorage.getItem('token');
+        const [objResponse, deptsResponse] = await Promise.all([
+          axios.get(`http://localhost:4000/api/objectives/${objectiveId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('http://localhost:4000/api/departments', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
+  
+        const { objective, keyResults: krs } = objResponse.data;
+        setFormData({
+          title: objective.title,
+          description: objective.description || '',
+          type: objective.type,
+          department: objective.department || '',
+          timeframe: objective.timeframe
+        });
+        setKeyResults(krs);
+        setDepartments(deptsResponse.data);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    if (isOpen && objectiveId) {
+      fetchData();
     }
   }, [isOpen, objectiveId]);
 
@@ -242,12 +281,18 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Department
-                  <input
-                    type="text"
+                  <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((dept) => (
+                      <option key={dept._id} value={dept._id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
                 </label>
               </div>
             </div>
