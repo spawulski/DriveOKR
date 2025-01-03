@@ -115,7 +115,14 @@ router.put('/:id', requireAuth, async (req, res) => {
     }
 
     // Check if user has permission to edit
-    if (objective.owner.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    const canEdit = 
+      objective.owner.toString() === req.user._id.toString() || // Owner
+      req.user.isAdmin || // Admin
+      (req.user.role === 'manager' && objective.department === req.user.department) || // Department manager
+      (req.user.role === 'team_lead' && req.user.team && 
+        objective.owner.team && objective.owner.team.toString() === req.user.team.toString()); // Team lead
+
+    if (!canEdit) {
       return res.status(403).json({ error: 'Not authorized to edit this objective' });
     }
 
