@@ -1,6 +1,7 @@
 // frontend/src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './components/auth/LoginPage';
+// import LoginPage from './components/auth/LoginPage';
+import LandingPage from './components/LandingPage/LandingPage';
 import AuthCallback from './components/auth/AuthCallback';
 import Dashboard from './components/Dashboard/Dashboard';
 import AdminDashboard from './components/admin/AdminDashboard';
@@ -61,10 +62,10 @@ function App() {
       <Router>
         <Routes>
           <Route 
-            path="/login" 
+            path="/" 
             element={
               <PublicRoute>
-                <LoginPage />
+                <LandingPage />  {/* Change this from LoginPage to LandingPage */}
               </PublicRoute>
             } 
           />
@@ -85,7 +86,6 @@ function App() {
               </AdminRoute>
             }
           />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
