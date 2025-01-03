@@ -1,5 +1,5 @@
 // frontend/src/components/objectives/CreateObjectiveForm.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
@@ -22,6 +22,24 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
   const [keyResults, setKeyResults] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:4000/api/departments', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setDepartments(response.data);
+      } catch (error) {
+        console.error('Error fetching departments:', error);
+        setError('Failed to fetch departments');
+      }
+    };
+
+    fetchDepartments();
+  }, []);
 
   const handleAddKeyResult = () => {
     setKeyResults([...keyResults, {
@@ -200,12 +218,19 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Department
-                  <input
-                    type="text"
+                  <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  />
+                    required={formData.type === 'department' || formData.type === 'individual'}
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((dept) => (
+                      <option key={dept._id} value={dept._id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
                 </label>
               </div>
             </div>
