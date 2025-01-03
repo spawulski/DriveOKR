@@ -5,6 +5,17 @@ const KeyResult = require('../models/KeyResult');
 const Objective = require('../models/Objective');
 const { requireAuth } = require('../middleware/auth');
 
+// Helper function to check user permissions
+const canEditKeyResult = async (user, objective) => {
+  return (
+    objective.owner.toString() === user._id.toString() || // Owner
+    user.isAdmin || // Admin
+    (user.role === 'manager' && objective.department === user.department) || // Department manager
+    (user.role === 'team_lead' && user.team && 
+      objective.owner.team && objective.owner.team.toString() === user.team.toString()) // Team lead
+  );
+};
+
 // Get key results for an objective
 router.get('/objective/:objectiveId', requireAuth, async (req, res) => {
   try {
@@ -50,13 +61,15 @@ router.put('/:id', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Key Result not found' });
     }
 
-    // Check if user has permission through objective ownership
+    // Get parent objective to check permissions
     const objective = await Objective.findById(keyResult.objective);
     if (!objective) {
       return res.status(404).json({ error: 'Parent objective not found' });
     }
 
-    if (objective.owner.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    // Check permissions
+    const hasPermission = await canEditKeyResult(req.user, objective);
+    if (!hasPermission) {
       return res.status(403).json({ error: 'Not authorized to edit this key result' });
     }
 
@@ -66,20 +79,8 @@ router.put('/:id', requireAuth, async (req, res) => {
       updatedAt: new Date()
     });
 
-    // Save the key result (this will trigger the pre-save hooks)
     await keyResult.save();
-
-    // Fetch the fresh document to ensure we have all calculated fields
     const updatedKeyResult = await KeyResult.findById(req.params.id);
-    
-    console.log('Updated Key Result:', {
-      title: updatedKeyResult.title,
-      progress: updatedKeyResult.progress,
-      status: updatedKeyResult.status,
-      currentValue: updatedKeyResult.currentValue,
-      targetValue: updatedKeyResult.targetValue
-    });
-
     res.json(updatedKeyResult);
   } catch (error) {
     console.error('Error updating key result:', error);
@@ -87,7 +88,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// backend/src/routes/keyResults.js
+// Delete key result
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const keyResult = await KeyResult.findById(req.params.id);
@@ -95,9 +96,19 @@ router.delete('/:id', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Key Result not found' });
     }
 
-    // Delete the key result
+    // Get parent objective to check permissions
+    const objective = await Objective.findById(keyResult.objective);
+    if (!objective) {
+      return res.status(404).json({ error: 'Parent objective not found' });
+    }
+
+    // Check permissions
+    const hasPermission = await canEditKeyResult(req.user, objective);
+    if (!hasPermission) {
+      return res.status(403).json({ error: 'Not authorized to delete this key result' });
+    }
+
     await KeyResult.findByIdAndDelete(keyResult._id);
-    
     res.json({ message: 'Key Result deleted successfully' });
   } catch (error) {
     console.error('Delete key result error:', error);
@@ -117,12 +128,10 @@ router.patch('/:id/confidence', requireAuth, async (req, res) => {
     if (!objective) {
       return res.status(404).json({ error: 'Objective not found' });
     }
-    
+
     // Check permissions
-    if (
-      objective.owner.toString() !== req.user._id.toString() &&
-      req.user.role !== 'admin'
-    ) {
+    const hasPermission = await canEditKeyResult(req.user, objective);
+    if (!hasPermission) {
       return res.status(403).json({ error: 'Unauthorized to update this key result' });
     }
 
