@@ -19,7 +19,7 @@ const objectiveSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['individual', 'department', 'organization'],
+    enum: ['individual', 'team', 'department', 'organization'],
     required: true
   },
   status: {
@@ -50,10 +50,20 @@ const objectiveSchema = new mongoose.Schema({
     ref: 'Objective',
     required: false
   },
+  // Update department to reference Department model
   department: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Department',
     required: function() {
-      return this.type === 'department' || this.type === 'individual';
+      return this.type === 'department' || this.type === 'individual' || this.type === 'team';
+    }
+  },
+  // Add team field
+  team: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team',
+    required: function() {
+      return this.type === 'team';
     }
   }
 }, {

@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const Objective = require('../models/Objective');
 const KeyResult = require('../models/KeyResult');
+const User = require('../models/User');
+const Team = require('../models/Team');
 const { requireAuth } = require('../middleware/auth');
 
 // Add this route at the top of your routes
@@ -55,20 +57,57 @@ router.get('/', requireAuth, async (req, res) => {
   try {
     const query = {};
     
+    // Time period filters
     if (req.query.quarter && req.query.year) {
       query['timeframe.quarter'] = parseInt(req.query.quarter);
       query['timeframe.year'] = parseInt(req.query.year);
     }
 
+    // Type filter
+    if (req.query.type) {
+      query.type = req.query.type;
+    }
+
+    // Department filter
+    if (req.query.department) {
+      query.department = req.query.department;
+    }
+
+    // Team filter (will need to find objectives owned by team members)
+    if (req.query.team) {
+      // When viewing team objectives, show:
+      // 1. Team objectives for this team
+      // 2. Individual objectives for team members
+      const teamUsers = await User.find({ team: req.query.team }).select('_id');
+      query.$or = [
+        { type: 'team', team: req.query.team },
+        { type: 'individual', owner: { $in: teamUsers.map(u => u._id) } }
+      ];
+    } else if (req.query.department) {
+      query.department = req.query.department;
+      query.type = 'department';
+    } else if (req.query.type) {
+      query.type = req.query.type;
+    }
+
+    // Individual filter
+    if (req.query.owner) {
+      query.owner = req.query.owner;
+      query.type = 'individual';
+    }
+
+    console.log('Query:', query); // Add logging to help debug
+
     const objectives = await Objective.find(query)
-      .populate('owner', 'name email');
+      .populate('owner', 'name email')
+      .populate('department', 'name')
+      .populate('team', 'name');
 
     // Fetch and process key results for each objective
     const objectivesWithKRs = await Promise.all(
       objectives.map(async (objective) => {
         const keyResults = await KeyResult.find({ objective: objective._id });
         
-        // Calculate overall objective progress based on KR progress
         const totalProgress = keyResults.length > 0
           ? Math.round(keyResults.reduce((sum, kr) => sum + kr.progress, 0) / keyResults.length)
           : 0;
@@ -76,7 +115,7 @@ router.get('/', requireAuth, async (req, res) => {
         return {
           ...objective.toObject(),
           progress: totalProgress,
-          keyResults: keyResults.map(kr => kr.toObject()) // This will include the calculated progress
+          keyResults: keyResults.map(kr => kr.toObject())
         };
       })
     );
@@ -94,7 +133,6 @@ router.post('/', requireAuth, async (req, res) => {
     console.log('Creating new objective:', req.body);
     const objective = new Objective({
       ...req.body,
-      owner: req.user._id
     });
 
     await objective.save();
