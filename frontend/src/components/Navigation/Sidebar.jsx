@@ -30,7 +30,7 @@ const Sidebar = ({ isOpen, setSelectedView }) => {
 
         // Build organization structure
         const structure = {
-          name: "DriveOKR", // Or fetch from config/settings
+          name: "Organization", // Or fetch from config/settings
           departments: departmentsRes.data.map(dept => ({
             _id: dept._id,
             name: dept.name,
@@ -112,7 +112,7 @@ const Sidebar = ({ isOpen, setSelectedView }) => {
     }`}>
       <div className="h-full overflow-y-auto">
         <div className="p-4">
-          <h2 className="text-lg font-semibold mb-4">Organization</h2>
+          <h2 className="pt-12 text-lg font-semibold mb-4 ">DriveOKR</h2>
           
           {/* Organization Level */}
           <div className="mb-2">
