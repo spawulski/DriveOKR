@@ -147,7 +147,7 @@ const seedData = async () => {
     ]);
     console.log('Updated user assignments');
 
-    // Create objectives
+// Create objectives
 const objectives = await Objective.create([
   // Organization Objective
   {
@@ -166,7 +166,7 @@ const objectives = await Objective.create([
     title: 'Launch New Feature Set',
     description: 'Deploy major platform updates',
     type: 'department',
-    department: departments[0]._id,
+    department: departments[0]._id,  // Engineering department
     owner: users[1]._id, // Engineering Manager
     status: 'active',
     timeframe: {
@@ -174,13 +174,27 @@ const objectives = await Objective.create([
       year: 2025
     }
   },
-  // Individual Objective (Frontend Lead)
+  // Team Objective (Frontend Team)
   {
     title: 'Improve Frontend Performance',
     description: 'Optimize application loading and rendering',
-    type: 'individual',
-    department: departments[0]._id,
+    type: 'team',
+    department: departments[0]._id,  // Engineering department
+    team: teams[0]._id,  // Frontend team
     owner: users[3]._id, // Frontend Lead
+    status: 'active',
+    timeframe: {
+      quarter: 1,
+      year: 2025
+    }
+  },
+  // Individual Objective (Frontend Dev)
+  {
+    title: 'Implement Component Library',
+    description: 'Create reusable component system',
+    type: 'individual',
+    department: departments[0]._id,  // Engineering department
+    owner: users[5]._id, // Frontend Dev 1
     status: 'active',
     timeframe: {
       quarter: 1,
@@ -238,7 +252,7 @@ const keyResults = await KeyResult.create([
     unit: '%',
     confidenceLevel: 'medium'
   },
-  // KRs for Individual Objective
+  // KRs for Team Objective
   {
     objective: objectives[2]._id,
     title: 'Page Load Time',
@@ -260,8 +274,31 @@ const keyResults = await KeyResult.create([
     currentValue: 85,
     unit: 'points',
     confidenceLevel: 'high'
+  },
+  // KRs for Individual Objective
+  {
+    objective: objectives[3]._id,
+    title: 'Component Creation',
+    description: 'Build reusable components',
+    metricType: 'number',
+    startValue: 0,
+    targetValue: 20,
+    currentValue: 8,
+    unit: 'components',
+    confidenceLevel: 'high'
+  },
+  {
+    objective: objectives[3]._id,
+    title: 'Documentation Coverage',
+    description: 'Document all components',
+    metricType: 'percentage',
+    startValue: 0,
+    targetValue: 100,
+    currentValue: 40,
+    unit: '%',
+    confidenceLevel: 'medium'
   }
-  ]);
+]);
 console.log('Created key results');
 
     console.log('Seed completed successfully!');

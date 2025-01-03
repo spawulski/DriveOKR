@@ -25,15 +25,60 @@ const Dashboard = () => {
   const [selectedView, setSelectedView] = useState({ type: 'organization' });
   const [expandedCards, setExpandedCards] = useState({});
 
+  // const fetchObjectives = async () => {
+  //   try {
+  //     const token = localStorage.getItem('token');
+  //     const response = await axios.get(
+  //       `http://localhost:4000/api/objectives?quarter=${selectedQuarter}&year=${selectedYear}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       }
+  //     );
+  //     setObjectives(response.data);
+  //   } catch (err) {
+  //     setError('Failed to fetch objectives');
+  //     console.error('Error fetching objectives:', err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchObjectives();
+  //   const fetchCurrentUser = async () => {
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       const response = await axios.get('http://localhost:4000/api/auth/verify', {
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       });
+  //       setCurrentUser(response.data.user);
+  //     } catch (error) {
+  //       console.error('Error fetching user:', error);
+  //     }
+  //   };
+  
+  //   fetchCurrentUser();
+  // }, [selectedQuarter, selectedYear]);
+
   const fetchObjectives = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `http://localhost:4000/api/objectives?quarter=${selectedQuarter}&year=${selectedYear}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      let url = `http://localhost:4000/api/objectives?quarter=${selectedQuarter}&year=${selectedYear}`;
+      
+      // Add filters based on selected view
+      if (selectedView.type === 'department' && selectedView.id) {
+        url += `&department=${selectedView.id}&type=department`;
+      } else if (selectedView.type === 'team' && selectedView.id) {
+        url += `&team=${selectedView.id}`;
+      } else if (selectedView.type === 'individual' && selectedView.member) {
+        url += `&owner=${selectedView.member}`;
+      } else if (selectedView.type === 'organization') {
+        url += `&type=organization`;
+      }
+
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setObjectives(response.data);
     } catch (err) {
       setError('Failed to fetch objectives');
@@ -43,22 +88,10 @@ const Dashboard = () => {
     }
   };
 
+  // Update useEffect to include selectedView in dependencies
   useEffect(() => {
     fetchObjectives();
-    const fetchCurrentUser = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:4000/api/auth/verify', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setCurrentUser(response.data.user);
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      }
-    };
-  
-    fetchCurrentUser();
-  }, [selectedQuarter, selectedYear]);
+  }, [selectedQuarter, selectedYear, selectedView]);
 
   const handleEditClick = (objectiveId) => {
     setSelectedObjectiveId(objectiveId);
@@ -126,6 +159,7 @@ const Dashboard = () => {
     <Sidebar 
       isOpen={isSidebarOpen}
       setSelectedView={setSelectedView}
+      selectedView={selectedView}
     />
 
     {/* Main Content */}
@@ -135,6 +169,12 @@ const Dashboard = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl font-bold">OKR Dashboard</h1>
+              <p className="text-gray-500">
+                  {selectedView.type === 'organization' && 'Organization OKRs'}
+                  {selectedView.type === 'department' && `Department OKRs - ${selectedView.name}`}
+                  {selectedView.type === 'team' && `Team OKRs - ${selectedView.name}`}
+                  {selectedView.type === 'individual' && `Individual OKRs - ${selectedView.name}`}
+                </p>
               <div className="flex space-x-4">
                 <select
                   value={selectedQuarter}
