@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import EditObjectiveForm from '../objectives/EditObjectiveForm';
 import Header from '../Navigation/Header';
+import KeyResultUpdateModal from '../objectives/KeyResultUpdateModal';
 import CreateObjectiveForm from '../objectives/CreateObjectiveForm';
 import ProgressChart from '../charts/ProgressChart';
 import Sidebar from '../Navigation/Sidebar';
@@ -24,41 +25,10 @@ const Dashboard = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedView, setSelectedView] = useState({ type: 'organization' });
   const [expandedCards, setExpandedCards] = useState({});
-
-  // const fetchObjectives = async () => {
-  //   try {
-  //     const token = localStorage.getItem('token');
-  //     const response = await axios.get(
-  //       `http://localhost:4000/api/objectives?quarter=${selectedQuarter}&year=${selectedYear}`,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` }
-  //       }
-  //     );
-  //     setObjectives(response.data);
-  //   } catch (err) {
-  //     setError('Failed to fetch objectives');
-  //     console.error('Error fetching objectives:', err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchObjectives();
-  //   const fetchCurrentUser = async () => {
-  //     try {
-  //       const token = localStorage.getItem('token');
-  //       const response = await axios.get('http://localhost:4000/api/auth/verify', {
-  //         headers: { Authorization: `Bearer ${token}` }
-  //       });
-  //       setCurrentUser(response.data.user);
-  //     } catch (error) {
-  //       console.error('Error fetching user:', error);
-  //     }
-  //   };
-  
-  //   fetchCurrentUser();
-  // }, [selectedQuarter, selectedYear]);
+  const [isKeyResultModalOpen, setIsKeyResultModalOpen] = useState(false);
+  const [isKeyResultUpdateModalOpen, setIsKeyResultUpdateModalOpen] = useState(false);
+  const [selectedKeyResult, setSelectedKeyResult] = useState(null);
+  const [selectedObjectiveForKR, setSelectedObjectiveForKR] = useState(null);
 
   const fetchObjectives = async () => {
     try {
@@ -134,6 +104,40 @@ const Dashboard = () => {
     }));
   };
 
+  // Handler for editing a key result (full edit)
+  const handleEditKeyResult = (objectiveId, keyResult) => {
+    setSelectedObjectiveForKR(objectiveId);
+    setSelectedKeyResult(keyResult);
+    setIsKeyResultModalOpen(true);
+  };
+
+  // Handler for updating key result progress
+  const handleUpdateKeyResult = (objectiveId, keyResult) => {
+    setSelectedObjectiveForKR(objectiveId);
+    setSelectedKeyResult(keyResult);
+    setIsKeyResultUpdateModalOpen(true);
+  };
+
+  // Handler for completing key result edit
+  const handleKeyResultComplete = async (updated = false) => {
+    if (updated) {
+      await fetchObjectives();
+    }
+    setIsKeyResultModalOpen(false);
+    setSelectedKeyResult(null);
+    setSelectedObjectiveForKR(null);
+  };
+
+  // Handler for completing key result progress update
+  const handleKeyResultUpdateComplete = async (updated = false) => {
+    if (updated) {
+      await fetchObjectives();
+    }
+    setIsKeyResultUpdateModalOpen(false);
+    setSelectedKeyResult(null);
+    setSelectedObjectiveForKR(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -163,113 +167,158 @@ const Dashboard = () => {
     />
 
     {/* Main Content */}
-    <div className={`transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
-      <div className="p-8">
-        <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold">OKR Dashboard</h1>
-              <p className="text-gray-500">
+      <div className={`transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+        <div className="p-8">
+          <div className="min-h-screen bg-gray-50 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold">OKR Dashboard</h1>
+                <p className="text-gray-500">
                   {selectedView.type === 'organization' && 'Organization OKRs'}
-                  {selectedView.type === 'department' && `Department OKRs - ${selectedView.name}`}
-                  {selectedView.type === 'team' && `Team OKRs - ${selectedView.name}`}
+                  {selectedView.type === 'department' && (
+                    <>
+                      Department OKRs - {selectedView.name}
+                      {selectedView.manager && <span className="ml-2">· Manager: {selectedView.manager}</span>}
+                    </>
+                  )}
+                  {selectedView.type === 'team' && (
+                    <>
+                      Team OKRs - {selectedView.name}
+                      {selectedView.lead && <span className="ml-2">· Lead: {selectedView.lead}</span>}
+                    </>
+                  )}
                   {selectedView.type === 'individual' && `Individual OKRs - ${selectedView.name}`}
                 </p>
-              <div className="flex space-x-4">
-                <select
-                  value={selectedQuarter}
-                  onChange={(e) => setSelectedQuarter(Number(e.target.value))}
-                  className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                  {[1, 2, 3, 4].map((quarter) => (
-                    <option key={quarter} value={quarter}>Q{quarter}</option>
-                  ))}
-                </select>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                  {[2023, 2024, 2025].map((year) => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Add Objective
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white shadow overflow-hidden sm:rounded-md">
-              <ul className="divide-y divide-gray-200">
-              {objectives.map((objective) => (
-                <li key={objective._id} className="px-6 py-4 hover:bg-gray-50">
-                  <div 
-                    className="cursor-pointer"
-                    onClick={() => toggleCard(objective._id)}
+                <div className="flex space-x-4">
+                  <select
+                    value={selectedQuarter}
+                    onChange={(e) => setSelectedQuarter(Number(e.target.value))}
+                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                        {objective.title}
-                        <svg 
-                          className={`ml-2 h-5 w-5 transform transition-transform ${expandedCards[objective._id] ? 'rotate-180' : ''}`} 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {objective.description}
-                      </p>
-                      <div className="mt-2 flex items-center text-sm text-gray-500">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          objective.type === 'individual' ? 'bg-blue-100 text-blue-800' :
-                          objective.type === 'department' ? 'bg-green-100 text-green-800' :
-                          'bg-purple-100 text-purple-800'
-                        }`}>
-                          {objective.type}
-                        </span>
-                        <span className="ml-2">
-                          Progress: {objective.progress}%
-                        </span>
-                      </div>
+                    {[1, 2, 3, 4].map((quarter) => (
+                      <option key={quarter} value={quarter}>Q{quarter}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(Number(e.target.value))}
+                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  >
+                    {[2023, 2024, 2025].map((year) => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Add Objective
+                  </button>
+                </div>
+              </div>
 
-                      {/* Key Results Section */}
-                      {objective.keyResults && objective.keyResults.length > 0 && (
-                        <div className="mt-4 space-y-2">
-                          {objective.keyResults.map((kr) => {
-                            
-                            // Calculate progress here as backup
-                            const progress = kr.progress || (() => {
-                              if (kr.currentValue >= kr.targetValue) return 100;
-                              if (kr.currentValue <= kr.startValue) return 0;
-                              const total = kr.targetValue - kr.startValue;
-                              const current = kr.currentValue - kr.startValue;
-                              return Math.min(100, Math.max(0, Math.round((current / total) * 100)));
-                            })()
-                            
-                            console.log('Rendering key result:', {
-                              title: kr.title,
-                              status: kr.status,
-                              progress: kr.progress,
-                              confidenceLevel: kr.confidenceLevel,
-                              currentValue: kr.currentValue,
-                              targetValue: kr.targetValue,
-                              startValue: kr.startValue
-                            });
+              <div className="bg-white shadow overflow-hidden sm:rounded-md">
+                <ul className="divide-y divide-gray-200">
+                  {objectives.map((objective) => (
+                    <li key={objective._id} className="px-6 py-4 hover:bg-gray-50">
+                      <div 
+                        className="cursor-pointer"
+                        onClick={() => toggleCard(objective._id)}
+                      >
+                        {/* Objective Header */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                              {objective.title}
+                              <svg 
+                                className={`ml-2 h-5 w-5 transform transition-transform ${expandedCards[objective._id] ? 'rotate-180' : ''}`} 
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </h3>
+                            <p className="mt-1 text-sm text-gray-500">
+                              {objective.description}
+                            </p>
+                            <div className="mt-2 flex items-center text-sm text-gray-500">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                objective.type === 'individual' ? 'bg-blue-100 text-blue-800' :
+                                objective.type === 'department' ? 'bg-green-100 text-green-800' :
+                                'bg-purple-100 text-purple-800'
+                              }`}>
+                                {objective.type}
+                              </span>
+                              <span className="ml-2">
+                                Progress: {objective.progress}%
+                              </span>
+                            </div>
+                          </div>
 
-                            return (
+                          {/* Objective Action Buttons */}
+                          <div className="p-4 flex flex-col items-center space-y-4" onClick={(e) => e.stopPropagation()}>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditClick(objective._id);
+                              }}
+                              className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                              </svg>
+                            </button>
+                            {currentUser?.isAdmin && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteClick(objective._id);
+                                }}
+                                className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Key Results List */}
+                        {objective.keyResults && objective.keyResults.length > 0 && (
+                          <div className="mt-4 space-y-2">
+                            {objective.keyResults.map((kr) => (
                               <div key={kr._id} className="flex items-center space-x-4">
                                 <div className="flex-1">
                                   <div className="flex justify-between items-center text-sm">
                                     <span className="font-medium">{kr.title}</span>
                                     <div className="flex items-center space-x-2">
+                                      <div className="flex items-center space-x-1">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditKeyResult(objective._id, kr);
+                                          }}
+                                          className="p-1 text-gray-500 hover:text-indigo-600"
+                                        >
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                          </svg>
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleUpdateKeyResult(objective._id, kr);
+                                          }}
+                                          className="p-1 text-gray-500 hover:text-indigo-600"
+                                          title="Update Progress"
+                                        >
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                                          </svg>
+                                        </button>
+                                      </div>
                                       <span className={`px-2 py-0.5 rounded text-xs ${
                                         kr.confidenceLevel === 'high' ? 'bg-green-100 text-green-800' :
                                         kr.confidenceLevel === 'medium' ? 'bg-yellow-100 text-yellow-800' :
@@ -286,18 +335,20 @@ const Dashboard = () => {
                                     <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                                       <div
                                         className={`h-full rounded-full transition-all duration-500 ${
-                                          progress >= 75 ? 'bg-green-500' :
-                                          progress >= 50 ? 'bg-yellow-500' :
+                                          kr.progress >= 75 ? 'bg-green-500' :
+                                          kr.progress >= 50 ? 'bg-yellow-500' :
                                           'bg-red-500'
                                         }`}
-                                        style={{ width: `${progress}%` }}
+                                        style={{ width: `${kr.progress}%` }}
                                       />
                                     </div>
                                     <span className="text-xs text-gray-500 min-w-[3rem] text-right">
-                                      {progress}%
+                                      {kr.progress}%
                                     </span>
                                   </div>
-                                  <span className="text-xs">Status:</span>
+                                  <span 
+                                    className="text-xs">Status:
+                                  </span>
                                   <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
                                     kr.status === 'completed' ? 'bg-green-100 text-green-800' :
                                     kr.status === 'on_track' ? 'bg-blue-100 text-blue-800' :
@@ -313,87 +364,88 @@ const Dashboard = () => {
                                   </span>
                                 </div>
                               </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>                
-                    <div className="p-4 flex flex-col items-center space-y-4" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation(); // Stop the click from reaching the parent
-                          handleEditClick(objective._id);
-                        }}
-                        className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                      </button>
-                      {currentUser?.isAdmin && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // Stop the click from reaching the parent
-                            handleDeleteClick(objective._id);
-                          }}
-                          className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                    </div>
-                    {/* Expanded content */}
-                    {expandedCards[objective._id] && (
-                      <Collapse isOpen={expandedCards[objective._id]}>
-                        <div className="mt-4 space-y-4 pl-4">
-                          {objective.keyResults.map((kr) => (
-                            <div key={kr._id} className="border rounded-lg p-4">
-                              <h4 className="font-medium mb-2">{kr.title}</h4>
-                              <div className="text-sm text-gray-500 mb-4">
-                                Current: {kr.currentValue} / {kr.targetValue} {kr.unit}
-                              </div>
-                              <ProgressChart keyResult={kr} />
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Empty State - No Key Results */}
+                        {(!objective.keyResults || objective.keyResults.length === 0) && (
+                          <div className="mt-4 flex justify-center">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddKeyResult(objective._id);
+                              }}
+                              className="inline-flex items-center px-4 py-2 border border-indigo-500 text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50"
+                            >
+                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              Add First Key Result
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Expanded View with Charts */}
+                        {expandedCards[objective._id] && (
+                          <Collapse isOpen={expandedCards[objective._id]}>
+                            <div className="mt-4 space-y-4 pl-4">
+                              {objective.keyResults.map((kr) => (
+                                <div key={kr._id} className="border rounded-lg p-4">
+                                  <h4 className="font-medium mb-2">{kr.title}</h4>
+                                  <div className="text-sm text-gray-500 mb-4">
+                                    Current: {kr.currentValue} / {kr.targetValue} {kr.unit}
+                                  </div>
+                                  <ProgressChart keyResult={kr} />
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-                      </Collapse>
-                    )}
-                  </div>
-                </li>
-              ))}
-              </ul>
+                          </Collapse>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {error && (
+                <div className="mt-4 text-red-600">
+                  {error}
+                </div>
+              )}
             </div>
 
-            {error && (
-              <div className="mt-4 text-red-600">
-                {error}
-              </div>
-            )}
+            {/* Modals */}
+            <KeyResultUpdateModal
+              isOpen={isKeyResultModalOpen}
+              onClose={handleKeyResultComplete}
+              keyResult={selectedKeyResult}
+              objectiveId={selectedObjectiveForKR}
+              updateOnly={false}
+            />
+
+            <KeyResultUpdateModal
+              isOpen={isKeyResultUpdateModalOpen}
+              onClose={handleKeyResultUpdateComplete}
+              keyResult={selectedKeyResult}
+              objectiveId={selectedObjectiveForKR}
+              updateOnly={true}
+            />
+
+            <CreateObjectiveForm
+              isOpen={isCreateModalOpen}
+              onClose={handleCreateComplete}
+            />
+
+            <EditObjectiveForm
+              isOpen={isEditModalOpen}
+              onClose={handleEditComplete}
+              objectiveId={selectedObjectiveId}
+            />
           </div>
-
-          <CreateObjectiveForm
-            isOpen={isCreateModalOpen}
-            onClose={handleCreateComplete}
-            // onClose={(created) => {
-            //   if (created) {
-            //     fetchObjectives();
-            //   }
-            //   setIsCreateModalOpen(false);
-            // }}
-          />
-
-          <EditObjectiveForm
-            isOpen={isEditModalOpen}
-            onClose={handleEditComplete}
-            objectiveId={selectedObjectiveId}
-          />
         </div>
       </div>
-    </div>
-    </div>
+      </div>
   );
 };
 
