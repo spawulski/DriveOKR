@@ -1,4 +1,5 @@
 // frontend/src/components/objectives/EditObjectiveForm.jsx
+// Simplified version focusing only on objective details
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -6,12 +7,22 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    type: '',
+    department: '',
+    team: '',
+    owner: '',
     timeframe: {
       quarter: 1,
       year: 2024
     }
   });
-
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [departments, setDepartments] = useState([]);
+  const [teams, setTeams] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [keyResults, setKeyResults] = useState([]);
   const emptyKeyResult = {
     title: '',
     description: '',
@@ -22,18 +33,6 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
     unit: '',
     confidenceLevel: 'medium'
   };
-
-  const [keyResults, setKeyResults] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [departments, setDepartments] = useState([]);
-  const [teams, setTeams] = useState([]);
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    console.log('FormData updated:', formData);
-  }, [formData]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -51,171 +50,58 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
     fetchCurrentUser();
   }, []);
 
-  // useEffect(() => {    
-  //   const fetchOKR = async () => {
-  //     if (!objectiveId) return;
-  //     setLoading(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!objectiveId) return;
+      setLoading(true);
       
-  //     try {
-  //       const token = localStorage.getItem('token');
-  //       const response = await axios.get(
-  //         `http://localhost:4000/api/objectives/${objectiveId}`,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` }
-  //         }
-  //       );
-  //       console.log('fetchOKR Response:', response.data);
-  //       const { objective, keyResults: krs } = response.data;
-  //       setFormData({
-  //         title: objective.title,
-  //         description: objective.description || '',
-  //         type: objective.type,
-  //         department: objective.department || '',
-  //         team: objective.team || '',
-  //         owner: objective.owner || '', // Just use owner directly, don't try to access _id
-  //         timeframe: objective.timeframe
-  //         });
-  //       setKeyResults(krs);
-  //     } catch (err) {
-  //       console.error('Error fetching OKR:', err);
-  //       setError('Failed to load OKR data');
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   if (isOpen && objectiveId) {
-  //     fetchOKR();
-  //   }
-  // }, [isOpen, objectiveId]);
-
-  // In EditObjectiveForm.jsx
-
-// useEffect(() => {
-//   const fetchData = async () => {
-//     if (!objectiveId) return;
-//     setLoading(true);
-    
-//     try {
-//       const token = localStorage.getItem('token');
-//       const [objResponse, deptsResponse, teamsResponse, usersResponse] = await Promise.all([
-//         axios.get(`http://localhost:4000/api/objectives/${objectiveId}`, {
-//           headers: { Authorization: `Bearer ${token}` }
-//         }),
-//         axios.get('http://localhost:4000/api/departments', {
-//           headers: { Authorization: `Bearer ${token}` }
-//         }),
-//         axios.get('http://localhost:4000/api/teams', {
-//           headers: { Authorization: `Bearer ${token}` }
-//         }),
-//         axios.get('http://localhost:4000/api/users', {
-//           headers: { Authorization: `Bearer ${token}` }
-//         })
-//       ]);
-
-//       // Log the response to see its structure
-//       console.log('Objective Response:', objResponse.data);
-//       console.log('Department Response:', deptsResponse.data);
-//       console.log('Teams Response:', teamsResponse.data);
-//       console.log('users Response:', usersResponse.data);
-
-//       // Destructure the data properly based on your API response
-//       const { objective, keyResults } = objResponse.data;
-
-//       setFormData({
-//         title: objective.title,
-//         description: objective.description || '',
-//         type: objective.type || '',
-//         department: objective.department || '',
-//         team: objective.team?._id || '',
-//         owner: objective.owner?._id || '', // Just use owner directly, don't try to access _id
-//         timeframe: objective.timeframe
-//       });
-
-//       console.log('Objective Type:', objective.type);
-//       console.log('formdata type:', formData.type)
-
-//       setKeyResults(keyResults);
-//       setDepartments(deptsResponse.data);
-//       setTeams(teamsResponse.data);
-//       setUsers(usersResponse.data);
-//     } catch (err) {
-//       console.error('Error fetching data:', err);
-//       console.error('Full error object:', err);  // Add more detailed error logging
-//       setError('Failed to load data');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   if (isOpen && objectiveId) {
-//     fetchData();
-//   }
-// }, [isOpen, objectiveId]);
-
-useEffect(() => {
-  const fetchData = async () => {
-    if (!objectiveId) return;
-    setLoading(true);
-    
-    try {
-      const token = localStorage.getItem('token');
-      const [objResponse, deptsResponse, teamsResponse, usersResponse] = await Promise.all([
-        axios.get(`http://localhost:4000/api/objectives/${objectiveId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('http://localhost:4000/api/departments', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('http://localhost:4000/api/teams', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('http://localhost:4000/api/users', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      const { objective, keyResults } = objResponse.data;
-      
-      // Find the owner's team
-      const owner = usersResponse.data.find(user => user._id === objective.owner._id);
-      const ownerTeam = owner ? owner.team : null;
-
-      setFormData({
-        title: objective.title,
-        description: objective.description || '',
-        type: objective.type || '',
-        department: objective.department || '',
-        team: ownerTeam?._id || objective.team?._id || '',  // Set team from owner's team or objective's team
-        owner: objective.owner?._id || '',
-        timeframe: objective.timeframe
-      });
-
-      console.log('Setting form data:', {
-        owner,
-        ownerTeam,
-        type: objective.type,
-        department: objective.department,
-        team: ownerTeam?._id || objective.team?._id
-      });
-
-      setKeyResults(keyResults);
-      setDepartments(deptsResponse.data);
-      setTeams(teamsResponse.data);
-      setUsers(usersResponse.data);
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      console.error('Full error object:', err);
-      setError('Failed to load data');
-    } finally {
-      setLoading(false);
+      try {
+        const token = localStorage.getItem('token');
+        const [objResponse, deptsResponse, teamsResponse, usersResponse] = await Promise.all([
+          axios.get(`http://localhost:4000/api/objectives/${objectiveId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('http://localhost:4000/api/departments', {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('http://localhost:4000/api/teams', {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('http://localhost:4000/api/users', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
+  
+        const { objective, keyResults: krs } = objResponse.data;
+        const owner = usersResponse.data.find(user => user._id === objective.owner._id);
+        const ownerTeam = owner ? owner.team : null;
+  
+        setFormData({
+          title: objective.title,
+          description: objective.description || '',
+          type: objective.type || '',
+          department: objective.department || '',
+          team: ownerTeam?._id || objective.team?._id || '',
+          owner: objective.owner?._id || '',
+          timeframe: objective.timeframe
+        });
+  
+        setKeyResults(krs);
+        setDepartments(deptsResponse.data);
+        setTeams(teamsResponse.data);
+        setUsers(usersResponse.data);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    if (isOpen && objectiveId) {
+      fetchData();
     }
-  };
-
-  if (isOpen && objectiveId) {
-    fetchData();
-  }
-}, [isOpen, objectiveId]);
+  }, [isOpen, objectiveId]);
 
     // Add the renderContextSelector function
   const renderContextSelector = () => {
@@ -388,9 +274,8 @@ useEffect(() => {
     }
   };
 
-  // Add a function to handle adding new key results
   const handleAddKeyResult = () => {
-    setKeyResults([...keyResults, emptyKeyResult]);
+    setKeyResults([...keyResults, { ...emptyKeyResult }]);
   };
 
   const handleKeyResultChange = (index, field, value) => {
@@ -419,7 +304,7 @@ useEffect(() => {
       setError('Failed to delete key result');
     }
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -428,57 +313,64 @@ useEffect(() => {
     try {
       const token = localStorage.getItem('token');
       
-      // Clean up form data before sending
+      // Update objective
       const cleanedFormData = {
         title: formData.title,
         description: formData.description,
         type: formData.type,
         owner: formData.owner,
-        timeframe: formData.timeframe
+        timeframe: formData.timeframe,
+        ...(formData.department && { department: formData.department }),
+        ...(formData.team && { team: formData.team })
       };
-
-      // Only add department if it exists and isn't empty
-      if (formData.department && formData.department !== '') {
-        cleanedFormData.department = formData.department;
-      }
-
-      // Only add team if it exists and isn't empty
-      if (formData.team && formData.team !== '') {
-        cleanedFormData.team = formData.team;
-      }
-
-      console.log('Sending cleaned form data:', cleanedFormData);
-
-      const objectiveResponse = await axios.put(
+  
+      await axios.put(
         `http://localhost:4000/api/objectives/${objectiveId}`,
         cleanedFormData,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      console.log('Objective update response:', objectiveResponse.data);
   
-      // Update or create key results
+      // Handle key results
       const keyResultPromises = keyResults.map(kr => {
-        console.log('Processing key result:', kr);
-
+        // Calculate progress
+        const progress = (() => {
+          if (kr.currentValue >= kr.targetValue) return 100;
+          if (kr.currentValue <= kr.startValue) return 0;
+          const total = kr.targetValue - kr.startValue;
+          const current = kr.currentValue - kr.startValue;
+          return Math.round((current / total) * 100);
+        })();
+  
+        // Calculate status
+        const status = (() => {
+          if (progress >= 100) return 'completed';
+          if (kr.confidenceLevel === 'high' && progress >= 60) return 'on_track';
+          if (kr.confidenceLevel === 'medium' || progress >= 40) return 'at_risk';
+          return 'behind';
+        })();
+  
+        const payload = {
+          ...kr,
+          progress,
+          status
+        };
+  
         if (kr._id) {
-          // Existing key result - update it
+          // Update existing key result
           return axios.put(
             `http://localhost:4000/api/key-results/${kr._id}`,
-            kr,
+            payload,
             {
               headers: { Authorization: `Bearer ${token}` }
             }
           );
         } else {
-          // New key result - create it
+          // Create new key result
           return axios.post(
-            `http://localhost:4000/api/key-results`,
-            {
-              ...kr,
-              objective: objectiveId
-            },
+            'http://localhost:4000/api/key-results',
+            { ...payload, objective: objectiveId },
             {
               headers: { Authorization: `Bearer ${token}` }
             }
@@ -487,15 +379,14 @@ useEffect(() => {
       });
   
       await Promise.all(keyResultPromises);
-      onClose(true); // Pass true to indicate successful update
+      onClose(true);
     } catch (err) {
       console.error('Update error:', err);
-      console.error('Error details:', err.response?.data);  // Add this to see more error details
-      setError(err.response?.data?.error || 'Failed to update OKR');
+      setError(err.response?.data?.error || 'Failed to update objective and key results');
     } finally {
       setLoading(false);
     }
-};
+  };
 
   if (!isOpen) return null;
 
@@ -612,23 +503,26 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Key Results Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Key Results</h3>
             {keyResults.map((kr, index) => (
-              <div key={kr._id || index} className="p-4 border rounded-md relative ">
-                <h4 className="text-md font-medium">Key Result #{index + 1}</h4>
-                {currentUser?.isAdmin && kr._id && (
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteKeyResult(kr._id)}
-                    className="inline-flex items-center p-1 border border-transparent rounded-full absolute top-4 right-4 inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                )}
+              <div key={kr._id || index} className="p-4 border rounded-md space-y-4">
+                <div className="flex justify-between items-start">
+                  <h4 className="text-md font-medium">Key Result #{index + 1}</h4>
+                  {kr._id && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteKeyResult(kr._id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
+                {/* Key Result Fields */}
                 <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -686,7 +580,7 @@ useEffect(() => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
                         Start Value
@@ -694,7 +588,7 @@ useEffect(() => {
                           type="number"
                           required
                           value={kr.startValue}
-                          onChange={(e) => handleKeyResultChange(index, 'startValue', Number(e.target.value))}
+                          onChange={(e) => handleKeyResultChange(index, 'startValue', e.target.value)}
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         />
                       </label>
@@ -707,7 +601,7 @@ useEffect(() => {
                           type="number"
                           required
                           value={kr.currentValue}
-                          onChange={(e) => handleKeyResultChange(index, 'currentValue', Number(e.target.value))}
+                          onChange={(e) => handleKeyResultChange(index, 'currentValue', e.target.value)}
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         />
                       </label>
@@ -720,49 +614,44 @@ useEffect(() => {
                           type="number"
                           required
                           value={kr.targetValue}
-                          onChange={(e) => handleKeyResultChange(index, 'targetValue', Number(e.target.value))}
+                          onChange={(e) => handleKeyResultChange(index, 'targetValue', e.target.value)}
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                         />
                       </label>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">
-                        Confidence
-                        <select
-                          value={kr.confidenceLevel}
-                          onChange={(e) => handleKeyResultChange(index, 'confidenceLevel', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                        >
-                          <option value="low">Low</option>
-                          <option value="medium">Medium</option>
-                          <option value="high">High</option>
-                        </select>
-                      </label>
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Confidence Level
+                      <select
+                        value={kr.confidenceLevel}
+                        onChange={(e) => handleKeyResultChange(index, 'confidenceLevel', e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                      </select>
+                    </label>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
-          {/* In your form JSX, after the existing key results mapping, add: */}
-          <div className="flex justify-center pt-4">
-            <button
-              type="button"
-              onClick={handleAddKeyResult}
-              className="inline-flex items-center px-4 py-2 border border-indigo-500 text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Add Key Result
-            </button>
-          </div>
-          {error && (
-            <div className="text-red-600 text-sm mt-2">
-              {error}
+
+            <div className="flex justify-center pt-4">
+              <button
+                type="button"
+                onClick={handleAddKeyResult}
+                className="inline-flex items-center px-4 py-2 border border-indigo-500 text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add Key Result
+              </button>
             </div>
-          )}
+          </div>
 
           {/* Form Actions */}
           <div className="flex justify-between pt-4 border-t border-gray-200"> {/* Changed justify-end to justify-between */}
