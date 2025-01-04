@@ -12,10 +12,15 @@ router.get('/:id', requireAuth, async (req, res) => {
   try {
     console.log('Fetching objective with ID:', req.params.id);
     
-    const objective = await Objective.findById(req.params.id);
+    const objective = await Objective.findById(req.params.id)
+      .populate('team', 'name') // Populate team
+      .populate('type', 'name')
+      .populate('owner', 'name email'); // Populate owner
+    
     if (!objective) {
       return res.status(404).json({ error: 'Objective not found' });
     }
+    console.log('Found objective:', objective);
 
     // Fetch key results for this objective
     const keyResults = await KeyResult.find({ objective: objective._id });
@@ -28,6 +33,8 @@ router.get('/:id', requireAuth, async (req, res) => {
         description: objective.description,
         type: objective.type,
         department: objective.department,
+        team: objective.team, // Include team
+        owner: objective.owner, // Include owner
         timeframe: objective.timeframe,
         progress: objective.progress,
         status: objective.status
@@ -51,6 +58,50 @@ router.get('/:id', requireAuth, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+// router.get('/:id', requireAuth, async (req, res) => {
+//   try {
+//     console.log('Fetching objective with ID:', req.params.id);
+    
+//     const objective = await Objective.findById(req.params.id);
+//     if (!objective) {
+//       return res.status(404).json({ error: 'Objective not found' });
+//     }
+
+//     // Fetch key results for this objective
+//     const keyResults = await KeyResult.find({ objective: objective._id });
+//     console.log('Found key results:', keyResults);
+
+//     res.json({
+//       objective: {
+//         _id: objective._id,
+//         title: objective.title,
+//         description: objective.description,
+//         type: objective.type,
+//         department: objective.department,
+//         timeframe: objective.timeframe,
+//         progress: objective.progress,
+//         status: objective.status
+//       },
+//       keyResults: keyResults.map(kr => ({
+//         _id: kr._id,
+//         title: kr.title,
+//         description: kr.description,
+//         metricType: kr.metricType,
+//         startValue: kr.startValue,
+//         targetValue: kr.targetValue,
+//         currentValue: kr.currentValue,
+//         unit: kr.unit,
+//         confidenceLevel: kr.confidenceLevel,
+//         progress: kr.progress,
+//         status: kr.status
+//       }))
+//     });
+//   } catch (error) {
+//     console.error('Error fetching objective:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 // backend/src/routes/objectives.js
 router.get('/', requireAuth, async (req, res) => {

@@ -6,8 +6,6 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    type: 'individual',
-    department: '',
     timeframe: {
       quarter: 1,
       year: 2024
@@ -34,6 +32,10 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
+    console.log('FormData updated:', formData);
+  }, [formData]);
+
+  useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -49,43 +51,107 @@ const EditObjectiveForm = ({ isOpen, onClose, objectiveId }) => {
     fetchCurrentUser();
   }, []);
 
-  useEffect(() => {    
-    const fetchOKR = async () => {
-      if (!objectiveId) return;
-      setLoading(true);
+  // useEffect(() => {    
+  //   const fetchOKR = async () => {
+  //     if (!objectiveId) return;
+  //     setLoading(true);
       
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(
-          `http://localhost:4000/api/objectives/${objectiveId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+  //     try {
+  //       const token = localStorage.getItem('token');
+  //       const response = await axios.get(
+  //         `http://localhost:4000/api/objectives/${objectiveId}`,
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` }
+  //         }
+  //       );
+  //       console.log('fetchOKR Response:', response.data);
+  //       const { objective, keyResults: krs } = response.data;
+  //       setFormData({
+  //         title: objective.title,
+  //         description: objective.description || '',
+  //         type: objective.type,
+  //         department: objective.department || '',
+  //         team: objective.team || '',
+  //         owner: objective.owner || '', // Just use owner directly, don't try to access _id
+  //         timeframe: objective.timeframe
+  //         });
+  //       setKeyResults(krs);
+  //     } catch (err) {
+  //       console.error('Error fetching OKR:', err);
+  //       setError('Failed to load OKR data');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-        const { objective, keyResults: krs } = response.data;
-        setFormData({
-          title: objective.title,
-          description: objective.description || '',
-          type: objective.type,
-          department: objective.department || '',
-          timeframe: objective.timeframe
-        });
-        setKeyResults(krs);
-      } catch (err) {
-        console.error('Error fetching OKR:', err);
-        setError('Failed to load OKR data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isOpen && objectiveId) {
-      fetchOKR();
-    }
-  }, [isOpen, objectiveId]);
+  //   if (isOpen && objectiveId) {
+  //     fetchOKR();
+  //   }
+  // }, [isOpen, objectiveId]);
 
   // In EditObjectiveForm.jsx
+
+// useEffect(() => {
+//   const fetchData = async () => {
+//     if (!objectiveId) return;
+//     setLoading(true);
+    
+//     try {
+//       const token = localStorage.getItem('token');
+//       const [objResponse, deptsResponse, teamsResponse, usersResponse] = await Promise.all([
+//         axios.get(`http://localhost:4000/api/objectives/${objectiveId}`, {
+//           headers: { Authorization: `Bearer ${token}` }
+//         }),
+//         axios.get('http://localhost:4000/api/departments', {
+//           headers: { Authorization: `Bearer ${token}` }
+//         }),
+//         axios.get('http://localhost:4000/api/teams', {
+//           headers: { Authorization: `Bearer ${token}` }
+//         }),
+//         axios.get('http://localhost:4000/api/users', {
+//           headers: { Authorization: `Bearer ${token}` }
+//         })
+//       ]);
+
+//       // Log the response to see its structure
+//       console.log('Objective Response:', objResponse.data);
+//       console.log('Department Response:', deptsResponse.data);
+//       console.log('Teams Response:', teamsResponse.data);
+//       console.log('users Response:', usersResponse.data);
+
+//       // Destructure the data properly based on your API response
+//       const { objective, keyResults } = objResponse.data;
+
+//       setFormData({
+//         title: objective.title,
+//         description: objective.description || '',
+//         type: objective.type || '',
+//         department: objective.department || '',
+//         team: objective.team?._id || '',
+//         owner: objective.owner?._id || '', // Just use owner directly, don't try to access _id
+//         timeframe: objective.timeframe
+//       });
+
+//       console.log('Objective Type:', objective.type);
+//       console.log('formdata type:', formData.type)
+
+//       setKeyResults(keyResults);
+//       setDepartments(deptsResponse.data);
+//       setTeams(teamsResponse.data);
+//       setUsers(usersResponse.data);
+//     } catch (err) {
+//       console.error('Error fetching data:', err);
+//       console.error('Full error object:', err);  // Add more detailed error logging
+//       setError('Failed to load data');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   if (isOpen && objectiveId) {
+//     fetchData();
+//   }
+// }, [isOpen, objectiveId]);
 
 useEffect(() => {
   const fetchData = async () => {
@@ -109,28 +175,37 @@ useEffect(() => {
         })
       ]);
 
-      // Log the response to see its structure
-      console.log('Objective Response:', objResponse.data);
-
-      // Destructure the data properly based on your API response
       const { objective, keyResults } = objResponse.data;
+      
+      // Find the owner's team
+      const owner = usersResponse.data.find(user => user._id === objective.owner._id);
+      const ownerTeam = owner ? owner.team : null;
 
       setFormData({
         title: objective.title,
         description: objective.description || '',
-        type: objective.type,
+        type: objective.type || '',
         department: objective.department || '',
-        team: objective.team || '',
-        owner: objective.owner, // Just use owner directly, don't try to access _id
+        team: ownerTeam?._id || objective.team?._id || '',  // Set team from owner's team or objective's team
+        owner: objective.owner?._id || '',
         timeframe: objective.timeframe
       });
+
+      console.log('Setting form data:', {
+        owner,
+        ownerTeam,
+        type: objective.type,
+        department: objective.department,
+        team: ownerTeam?._id || objective.team?._id
+      });
+
       setKeyResults(keyResults);
       setDepartments(deptsResponse.data);
       setTeams(teamsResponse.data);
       setUsers(usersResponse.data);
     } catch (err) {
       console.error('Error fetching data:', err);
-      console.error('Full error object:', err);  // Add more detailed error logging
+      console.error('Full error object:', err);
       setError('Failed to load data');
     } finally {
       setLoading(false);
@@ -177,8 +252,7 @@ useEffect(() => {
                   value={formData.department}
                   onChange={(e) => setFormData({ 
                     ...formData, 
-                    department: e.target.value,
-                    team: '' 
+                    department: e.target.value
                   })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required
@@ -202,20 +276,114 @@ useEffect(() => {
                   required
                 >
                   <option value="">Select Team</option>
-                  {teams
-                    .filter(team => team.department._id === formData.department)
-                    .map((team) => (
-                      <option key={team._id} value={team._id}>
-                        {team.name}
-                      </option>
-                    ))}
+                  {teams.map((team) => (
+                    <option key={team._id} value={team._id}>
+                      {team.name}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
           </div>
         );
       
-      case 'individual':
+        case 'individual':
+          console.log('Individual Selector State:', {
+            formDataDepartment: formData.department,
+            formDataTeam: formData.team,
+            formDataOwner: formData.owner,
+            availableTeams: teams,
+            filteredTeams: teams.filter(team => team.department._id === formData.department)
+          });
+          return (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Department
+                  <select
+                    value={formData.department}
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      department: e.target.value,
+                      team: '',  // Reset team when department changes
+                      owner: ''  // Reset owner when department changes
+                    })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((dept) => (
+                      <option key={dept._id} value={dept._id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              
+              {formData.department && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Team
+                    <select
+                      value={formData.team}
+                      onChange={(e) => {
+                        console.log('Team selection changed:', e.target.value);
+                        setFormData({ 
+                          ...formData, 
+                          team: e.target.value,
+                          owner: ''
+                        });
+                      }}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      required
+                    >
+                      <option value="">Select Team</option>
+                      {teams
+                        .filter(team => {
+                          console.log('Filtering team:', {
+                            teamId: team._id,
+                            teamDepartment: team.department._id,
+                            formDataDepartment: formData.department,
+                            matches: team.department._id === formData.department
+                          });
+                          return team.department._id === formData.department;
+                        })
+                        .map((team) => (
+                          <option key={team._id} value={team._id}>
+                            {team.name}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                </div>
+              )}
+        
+              {formData.team && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    User
+                    <select
+                      value={formData.owner}
+                      onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      required
+                    >
+                      <option value="">Select User</option>
+                      {users
+                        .filter(user => user.team?._id === formData.team)
+                        .map((user) => (
+                          <option key={user._id} value={user._id}>
+                            {user.name}
+                          </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              )}
+            </div>
+          );
+      // case 'individual':
         return (
           <div className="space-y-4">
             <div>
@@ -225,9 +393,7 @@ useEffect(() => {
                   value={formData.department}
                   onChange={(e) => setFormData({ 
                     ...formData, 
-                    department: e.target.value,
-                    team: '',
-                    owner: ''
+                    department: e.target.value
                   })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required
@@ -242,34 +408,32 @@ useEffect(() => {
               </label>
             </div>
             
-            {formData.department && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Team
-                  <select
-                    value={formData.team}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      team: e.target.value,
-                      owner: ''
-                    })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    required
-                  >
-                    <option value="">Select Team</option>
-                    {teams
-                      .filter(team => team.department._id === formData.department)
-                      .map((team) => (
-                        <option key={team._id} value={team._id}>
-                          {team.name}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-              </div>
-            )}
 
-            {formData.team && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Team
+                <select
+                  value={formData.team}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    team: e.target.value,
+                    owner: '' // Reset owner when team changes
+                  })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  required
+                >
+                  <option value="">Select Team</option>
+                  {teams
+                    .filter(team => team.department._id === formData.department)  // Add this filter
+                    .map((team) => (
+                      <option key={team._id} value={team._id}>
+                        {team.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700">
                   User
@@ -281,7 +445,7 @@ useEffect(() => {
                   >
                     <option value="">Select User</option>
                     {users
-                      .filter(user => user.team?._id === formData.team)
+                      //.filter(user => user.team?._id === formData.team)
                       .map((user) => (
                         <option key={user._id} value={user._id}>
                           {user.name}
@@ -290,7 +454,7 @@ useEffect(() => {
                   </select>
                 </label>
               </div>
-            )}
+
           </div>
         );
       
@@ -447,8 +611,10 @@ useEffect(() => {
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
                   >
                     <option value="individual">Individual</option>
+                    <option value="team">Team</option>
                     <option value="department">Department</option>
                     <option value="organization">Organization</option>
                   </select>
