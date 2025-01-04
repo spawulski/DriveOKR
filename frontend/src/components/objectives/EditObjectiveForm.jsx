@@ -287,7 +287,7 @@ useEffect(() => {
           </div>
         );
       
-        case 'individual':
+      case 'individual':
           console.log('Individual Selector State:', {
             formDataDepartment: formData.department,
             formDataTeam: formData.team,
@@ -362,7 +362,7 @@ useEffect(() => {
               {formData.team && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    User
+                    Owner
                     <select
                       value={formData.owner}
                       onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
@@ -382,82 +382,7 @@ useEffect(() => {
                 </div>
               )}
             </div>
-          );
-      // case 'individual':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Department
-                <select
-                  value={formData.department}
-                  onChange={(e) => setFormData({ 
-                    ...formData, 
-                    department: e.target.value
-                  })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  required
-                >
-                  <option value="">Select Department</option>
-                  {departments.map((dept) => (
-                    <option key={dept._id} value={dept._id}>
-                      {dept.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Team
-                <select
-                  value={formData.team}
-                  onChange={(e) => setFormData({ 
-                    ...formData, 
-                    team: e.target.value,
-                    owner: '' // Reset owner when team changes
-                  })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  required
-                >
-                  <option value="">Select Team</option>
-                  {teams
-                    .filter(team => team.department._id === formData.department)  // Add this filter
-                    .map((team) => (
-                      <option key={team._id} value={team._id}>
-                        {team.name}
-                      </option>
-                    ))}
-                </select>
-              </label>
-            </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  User
-                  <select
-                    value={formData.owner}
-                    onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    required
-                  >
-                    <option value="">Select User</option>
-                    {users
-                      //.filter(user => user.team?._id === formData.team)
-                      .map((user) => (
-                        <option key={user._id} value={user._id}>
-                          {user.name}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-              </div>
-
-          </div>
-        );
-      
+          );      
       default:
         return null;
     }
@@ -503,18 +428,39 @@ useEffect(() => {
     try {
       const token = localStorage.getItem('token');
       
-      // Update objective
-      await axios.put(
+      // Clean up form data before sending
+      const cleanedFormData = {
+        title: formData.title,
+        description: formData.description,
+        type: formData.type,
+        owner: formData.owner,
+        timeframe: formData.timeframe
+      };
+
+      // Only add department if it exists and isn't empty
+      if (formData.department && formData.department !== '') {
+        cleanedFormData.department = formData.department;
+      }
+
+      // Only add team if it exists and isn't empty
+      if (formData.team && formData.team !== '') {
+        cleanedFormData.team = formData.team;
+      }
+
+      console.log('Sending cleaned form data:', cleanedFormData);
+
+      const objectiveResponse = await axios.put(
         `http://localhost:4000/api/objectives/${objectiveId}`,
-        formData,
+        cleanedFormData,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+      console.log('Objective update response:', objectiveResponse.data);
   
       // Update or create key results
       const keyResultPromises = keyResults.map(kr => {
-        console.log('Processing key result:', kr); // Debug log
+        console.log('Processing key result:', kr);
 
         if (kr._id) {
           // Existing key result - update it
@@ -544,11 +490,12 @@ useEffect(() => {
       onClose(true); // Pass true to indicate successful update
     } catch (err) {
       console.error('Update error:', err);
+      console.error('Error details:', err.response?.data);  // Add this to see more error details
       setError(err.response?.data?.error || 'Failed to update OKR');
     } finally {
       setLoading(false);
     }
-  };
+};
 
   if (!isOpen) return null;
 
@@ -818,21 +765,50 @@ useEffect(() => {
           )}
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : 'Save Changes'}
-            </button>
+          <div className="flex justify-between pt-4 border-t border-gray-200"> {/* Changed justify-end to justify-between */}
+            {/* Add delete button on the left */}
+            <div>
+              {currentUser?.isAdmin && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (window.confirm('Are you sure you want to delete this objective? This will also delete all associated key results.')) {
+                      try {
+                        const token = localStorage.getItem('token');
+                        await axios.delete(`http://localhost:4000/api/objectives/${objectiveId}`, {
+                          headers: { Authorization: `Bearer ${token}` }
+                        });
+                        onClose(true);
+                      } catch (err) {
+                        console.error('Delete error:', err);
+                        setError('Failed to delete objective');
+                      }
+                    }
+                  }}
+                  className="px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Delete Objective
+                </button>
+              )}
+            </div>
+
+            {/* Cancel and Save buttons on the right */}
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              >
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </form>
       )}
