@@ -1,13 +1,25 @@
 // frontend/src/components/Navigation/Header.jsx
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Header = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   console.log('Header - Current user:', user);  // Add this
   console.log('Is admin?', user?.isAdmin);      // Add this
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // Navigate to landing page after successful logout
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // You might want to show an error message to the user here
+    }
+  };
 
   return (
     <header className="bg-white shadow">
@@ -19,7 +31,6 @@ const Header = () => {
                 OKR Platform
               </Link>
             </div>
-            {/* In Header.jsx, update the navigation section */}
             <nav className="ml-6 flex space-x-8">
               <Link 
                 to="/dashboard" 
@@ -51,7 +62,7 @@ const Header = () => {
           <div className="flex items-center">
             <span className="text-sm text-gray-500 mr-4">{user?.name}</span>
             <button 
-              onClick={() => {/* Add logout handler */}} 
+              onClick={handleLogout}
               className="text-sm text-gray-500 hover:text-gray-700"
             >
               Logout
