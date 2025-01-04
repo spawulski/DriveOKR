@@ -54,26 +54,144 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
       // Add conditional rendering for the context selector
     const renderContextSelector = () => {
       switch(formData.type) {
-        case 'department':
+        case 'organization':
           return (
-            <div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Department
+                  <select
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((dept) => (
+                      <option key={dept._id} value={dept._id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Team
+                  <select
+                    value={formData.team}
+                    onChange={(e) => setFormData({ ...formData, team: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  >
+                    <option value="">Select Team</option>
+                    {teams
+                      .filter(team => team.department._id === formData.department)
+                      .map((team) => (
+                        <option key={team._id} value={team._id}>
+                          {team.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              </div>
+              <div>
               <label className="block text-sm font-medium text-gray-700">
-                Department
+                Owner
                 <select
-                  value={formData.department}
-                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  value={formData.owner}
+                  onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required
                 >
-                  <option value="">Select Department</option>
-                  {departments.map((dept) => (
-                    <option key={dept._id} value={dept._id}>
-                      {dept.name}
-                    </option>
-                  ))}
+                  <option value="">Select User</option>
+                  {console.log('Available users:', users)}
+                  {console.log('Selected team:', formData.team)}
+                  {users
+                    .filter(user => {
+                      console.log('Checking user:', user.name, 'team:', user.team?._id, 'against:', formData.team);
+                      return user.team?._id === formData.team;
+                    })
+                    .map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.name}
+                      </option>
+                    ))}
                 </select>
               </label>
             </div>
+            </div>
+            
+          );
+
+        case 'department':
+          return (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Department
+                  <select
+                    value={formData.department}
+                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((dept) => (
+                      <option key={dept._id} value={dept._id}>
+                        {dept.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Team
+                  <select
+                    value={formData.team}
+                    onChange={(e) => setFormData({ ...formData, team: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    required
+                  >
+                    <option value="">Select Team</option>
+                    {teams
+                      .filter(team => team.department._id === formData.department)
+                      .map((team) => (
+                        <option key={team._id} value={team._id}>
+                          {team.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              </div>
+              <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Owner
+                <select
+                  value={formData.owner}
+                  onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  required
+                >
+                  <option value="">Select User</option>
+                  {console.log('Available users:', users)}
+                  {console.log('Selected team:', formData.team)}
+                  {users
+                    .filter(user => {
+                      console.log('Checking user:', user.name, 'team:', user.team?._id, 'against:', formData.team);
+                      return user.team?._id === formData.team;
+                    })
+                    .map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            </div>
+            </div>
+            
           );
         
         case 'team':
@@ -117,6 +235,31 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                   </select>
                 </label>
               </div>
+              <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Owner
+                <select
+                  value={formData.owner}
+                  onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  required
+                >
+                  <option value="">Select User</option>
+                  {console.log('Available users:', users)}
+                  {console.log('Selected team:', formData.team)}
+                  {users
+                    .filter(user => {
+                      console.log('Checking user:', user.name, 'team:', user.team?._id, 'against:', formData.team);
+                      return user.team?._id === formData.team;
+                    })
+                    .map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            </div>
             </div>
           );
         
@@ -177,7 +320,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
           {formData.team && (
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                User
+                Owner
                 <select
                   value={formData.owner}
                   onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
