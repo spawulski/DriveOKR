@@ -29,6 +29,9 @@ const Dashboard = () => {
   const [isKeyResultUpdateModalOpen, setIsKeyResultUpdateModalOpen] = useState(false);
   const [selectedKeyResult, setSelectedKeyResult] = useState(null);
   const [selectedObjectiveForKR, setSelectedObjectiveForKR] = useState(null);
+  // Add to your state declarations in Dashboard.jsx
+  const [deptManagers, setDeptManagers] = useState({});  // Map of department ID to manager
+  const [teamLeads, setTeamLeads] = useState({});        // Map of team ID to team lead
 
   const fetchObjectives = async () => {
     try {
@@ -46,10 +49,30 @@ const Dashboard = () => {
         url += `&type=organization`;
       }
 
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
+      const [objResponse, usersResponse] = await Promise.all([
+        axios.get(url, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('http://localhost:4000/api/users', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+  
+      // Process users to create leadership maps
+      const deptMgrs = {};
+      const teamLds = {};
+      usersResponse.data.forEach(user => {
+        if (user.role === 'manager' && user.department) {
+          deptMgrs[user.department] = user;
+        }
+        if (user.role === 'team_lead' && user.team) {
+          teamLds[user.team] = user;
+        }
       });
-      setObjectives(response.data);
+  
+      setDeptManagers(deptMgrs);
+      setTeamLeads(teamLds);
+      setObjectives(objResponse.data);
     } catch (err) {
       setError('Failed to fetch objectives');
       console.error('Error fetching objectives:', err);
@@ -177,14 +200,14 @@ const Dashboard = () => {
                   {selectedView.type === 'organization' && 'Organization OKRs'}
                   {selectedView.type === 'department' && (
                     <>
-                      Department OKRs - {selectedView.name}
-                      {selectedView.manager && <span className="ml-2">· Manager: {selectedView.manager}</span>}
+                      Department: {selectedView.name}
+                      {selectedView.manager && <p>Manager: {selectedView.manager}</p>}
                     </>
                   )}
                   {selectedView.type === 'team' && (
                     <>
-                      Team OKRs - {selectedView.name}
-                      {selectedView.lead && <span className="ml-2">· Lead: {selectedView.lead}</span>}
+                      Team: {selectedView.name}
+                      {selectedView.lead && <p>Lead: {selectedView.lead}</p>}
                     </>
                   )}
                   {selectedView.type === 'individual' && `Individual OKRs - ${selectedView.name}`}
