@@ -10,7 +10,7 @@ import {
   GitBranch, // For Hierarchy View
   TrendingUp // For Performance Metrics
 } from 'lucide-react';
-import DriveOkrSS from '../../../public/Landing.png'
+import DriveOkrSS from '../../assets/Landing.png'
 
 
 const LandingPage = () => {
