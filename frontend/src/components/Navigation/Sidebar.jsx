@@ -146,7 +146,8 @@ const Sidebar = ({ isOpen, setSelectedView }) => {
                       onClick={() => setSelectedView({ 
                         type: 'department', 
                         id: dept._id,
-                        name: dept.name 
+                        name: dept.name,
+                        manager: dept.manager?.name // Add manager name
                       })}
                       className="w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100"
                     >
@@ -165,7 +166,8 @@ const Sidebar = ({ isOpen, setSelectedView }) => {
                               setSelectedView({ 
                                 type: 'team', 
                                 id: team._id,
-                                name: team.name
+                                name: team.name,
+                                lead: team.teamLead?.name // Add team lead name
                               });
                             }}
                             className="w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100"
