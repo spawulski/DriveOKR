@@ -175,11 +175,11 @@ const Sidebar = ({ isOpen, setSelectedView }) => {
                               <ChevronRight className="mr-1 h-4 w-4" />
                             }
                             {team.name}
-                            {team.teamLead && (
+                            {/* {team.teamLead && (
                               <span className="ml-2 text-xs text-gray-400">
                                 ({team.teamLead.name})
                               </span>
-                            )}
+                            )} */}
                           </button>
 
                           {/* Team Members */}
