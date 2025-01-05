@@ -37,10 +37,15 @@ router.post('/', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Objective not found' });
     }
 
-    // Create the key result
+    // Create the key result with initial confidence history
     const keyResult = new KeyResult({
       ...req.body,
-      currentValue: req.body.currentValue || req.body.startValue // Ensure currentValue is set
+      currentValue: req.body.currentValue || req.body.startValue,
+      confidenceHistory: [{
+        level: req.body.confidenceLevel || 'medium',
+        timestamp: new Date(),
+        note: req.body.confidenceNote || 'Initial confidence level'
+      }]
     });
 
     await keyResult.save();
@@ -71,6 +76,23 @@ router.put('/:id', requireAuth, async (req, res) => {
     const hasPermission = await canEditKeyResult(req.user, objective);
     if (!hasPermission) {
       return res.status(403).json({ error: 'Not authorized to edit this key result' });
+    }
+
+    // Check if confidence level is being updated
+    if (req.body.confidenceLevel && req.body.confidenceLevel !== keyResult.confidenceLevel) {
+      keyResult.confidenceHistory.push({
+        level: req.body.confidenceLevel,
+        timestamp: new Date(),
+        note: req.body.confidenceNote || `Confidence updated to ${req.body.confidenceLevel}`
+      });
+    }
+
+    // Check if current value is being updated
+    if (req.body.currentValue && req.body.currentValue !== keyResult.currentValue) {
+      keyResult.progressHistory.push({
+        value: req.body.currentValue,
+        date: new Date()
+      });
     }
 
     // Update the key result fields
@@ -135,6 +157,7 @@ router.patch('/:id/confidence', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Unauthorized to update this key result' });
     }
 
+    // Update confidence using the method from the model
     await keyResult.updateConfidence(req.body.confidenceLevel, req.body.note);
     res.json(keyResult);
   } catch (error) {
