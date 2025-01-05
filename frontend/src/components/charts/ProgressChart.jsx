@@ -124,99 +124,101 @@ const ProgressChart = ({ keyResult }) => {
   };
 
   return (
-    <div className="h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart 
-          data={chartData}
-          margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
-          {/* <XAxis 
-            dataKey={(data) => new Date(data.date).toLocaleDateString()}
-            tick={{ fontSize: 12 }}
-          /> */}
-          <XAxis
-            dataKey="index" // Use index for categorical X-axis
-            type="category"
-            tickFormatter={(index) => {
-              const entry = chartData[index];
-              return entry ? new Date(entry.date).toLocaleDateString() : '';
-            }}
-            tick={{ fontSize: 12 }}
-          />
-          <YAxis 
-            domain={[yMin, yMax]}
-            tickFormatter={(value) => `${value}${keyResult.unit ? ' ' + keyResult.unit : ''}`}
-            tick={{ fontSize: 12 }}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          
-          {/* Confidence level areas */}
-          {confidenceAreas.map((area, index) => {
-            const startData = chartData[area.startIndex];
-            const endData = chartData[area.endIndex];
-            if (!startData || !endData) return null;
-
-            return (
-              <ReferenceArea
-                key={index}
-                x1={startData.index} // Use index for x1
-                x2={endData.index}   // Use index for x2
-                y1={yMin}
-                y2={yMax}
-                fill={getConfidenceColor(area.level)}
-                fillOpacity={0.2}
-              />
-            );
-          })}
-          {/* {confidenceAreas.map((area, index) => {
-            const startData = chartData[area.startIndex];
-            const endData = chartData[area.endIndex];
+    <div data-testid="progress-chart">
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart 
+            data={chartData}
+            margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
+            {/* <XAxis 
+              dataKey={(data) => new Date(data.date).toLocaleDateString()}
+              tick={{ fontSize: 12 }}
+            /> */}
+            <XAxis
+              dataKey="index" // Use index for categorical X-axis
+              type="category"
+              tickFormatter={(index) => {
+                const entry = chartData[index];
+                return entry ? new Date(entry.date).toLocaleDateString() : '';
+              }}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis 
+              domain={[yMin, yMax]}
+              tickFormatter={(value) => `${value}${keyResult.unit ? ' ' + keyResult.unit : ''}`}
+              tick={{ fontSize: 12 }}
+            />
+            <Tooltip content={<CustomTooltip />} />
             
-            return (
-              <ReferenceArea
-                key={index}
-                x1={new Date(startData.date).toLocaleDateString()}
-                x2={new Date(endData.date).toLocaleDateString()}
-                y1={yMin}
-                y2={yMax}
-                fill={getConfidenceColor(area.level)}
-                fillOpacity={0.1}
-              />
-            );
-          })} */}
+            {/* Confidence level areas */}
+            {confidenceAreas.map((area, index) => {
+              const startData = chartData[area.startIndex];
+              const endData = chartData[area.endIndex];
+              if (!startData || !endData) return null;
 
-          {/* Target value reference line */}
-          <ReferenceLine 
-            y={keyResult.targetValue} 
-            stroke="#4F46E5" 
-            strokeDasharray="3 3"
-            label={{ 
-              value: 'Target',
-              position: 'right',
-              fill: '#4F46E5',
-              fontSize: 12
-            }}
-          />
+              return (
+                <ReferenceArea
+                  key={index}
+                  x1={startData.index} // Use index for x1
+                  x2={endData.index}   // Use index for x2
+                  y1={yMin}
+                  y2={yMax}
+                  fill={getConfidenceColor(area.level)}
+                  fillOpacity={0.2}
+                />
+              );
+            })}
+            {/* {confidenceAreas.map((area, index) => {
+              const startData = chartData[area.startIndex];
+              const endData = chartData[area.endIndex];
+              
+              return (
+                <ReferenceArea
+                  key={index}
+                  x1={new Date(startData.date).toLocaleDateString()}
+                  x2={new Date(endData.date).toLocaleDateString()}
+                  y1={yMin}
+                  y2={yMax}
+                  fill={getConfidenceColor(area.level)}
+                  fillOpacity={0.1}
+                />
+              );
+            })} */}
 
-          <Line 
-            type="monotone" 
-            dataKey="value" 
-            stroke="#4F46E5" 
-            strokeWidth={2}
-            dot={{ 
-              fill: '#4F46E5',
-              r: 4,
-              strokeWidth: 2
-            }}
-            activeDot={{
-              r: 6,
-              stroke: '#4F46E5',
-              strokeWidth: 2
-            }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+            {/* Target value reference line */}
+            <ReferenceLine 
+              y={keyResult.targetValue} 
+              stroke="#4F46E5" 
+              strokeDasharray="3 3"
+              label={{ 
+                value: 'Target',
+                position: 'right',
+                fill: '#4F46E5',
+                fontSize: 12
+              }}
+            />
+
+            <Line 
+              type="monotone" 
+              dataKey="value" 
+              stroke="#4F46E5" 
+              strokeWidth={2}
+              dot={{ 
+                fill: '#4F46E5',
+                r: 4,
+                strokeWidth: 2
+              }}
+              activeDot={{
+                r: 6,
+                stroke: '#4F46E5',
+                strokeWidth: 2
+              }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };
