@@ -102,7 +102,7 @@ router.get('/', requireAuth, async (req, res) => {
       query.type = 'individual';
     }
 
-    console.log('Query:', query); // Add logging to help debug
+    // console.log('Query:', query); // Add logging to help debug
 
     const objectives = await Objective.find(query)
       .populate('owner', 'name email')
