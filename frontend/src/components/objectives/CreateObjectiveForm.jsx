@@ -447,6 +447,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
       await Promise.all(keyResultPromises);
       handleClose(true); // Pass true to indicate successful creation
     } catch (err) {
+      console.log(err.response?.data)
       setError(err.response?.data?.error || 'Failed to create objective');
     } finally {
       setLoading(false);
@@ -484,7 +485,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" role="form">
           {/* Objective Section */}
           <div className="space-y-4 border-b border-gray-200 pb-6">
             <h3 className="text-lg font-medium">Objective Details</h3>
@@ -717,7 +718,10 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm mt-2">
+            <div 
+              className="text-red-600 text-sm mt-2"
+              data-testid="form-error"
+            >
               {error}
             </div>
           )}
