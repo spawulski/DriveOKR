@@ -84,45 +84,66 @@ const keyResultSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Validate confidence level based on progress and status
+// Calculate progress based on start and target values
+keyResultSchema.methods.calculateProgress = function() {
+  const { startValue, targetValue, currentValue } = this;
+  const isDecreasing = targetValue < startValue;
+  let progress;
+
+  if (isDecreasing) {
+    // For decreasing metrics (lower is better)
+    const totalRange = startValue - targetValue;
+    const currentProgress = startValue - currentValue;
+    progress = totalRange !== 0 ? (currentProgress / totalRange) * 100 : 0;
+  } else {
+    // For increasing metrics (higher is better)
+    const totalRange = targetValue - startValue;
+    const currentProgress = currentValue - startValue;
+    progress = totalRange !== 0 ? (currentProgress / totalRange) * 100 : 0;
+  }
+
+  // Ensure progress stays within 0-100 range
+  return Math.min(Math.max(Math.round(progress), 0), 100);
+};
+
+// Check if target is met based on direction
+keyResultSchema.methods.isTargetMet = function() {
+  const { currentValue, targetValue, startValue } = this;
+  const isDecreasing = targetValue < startValue;
+  return isDecreasing ? currentValue <= targetValue : currentValue >= targetValue;
+};
+
+// Middleware to update progress and status before saving
 keyResultSchema.pre('save', async function(next) {
- // Calculate progress
- const totalRange = this.targetValue - this.startValue;
- const currentProgress = this.currentValue - this.startValue;
- 
- if (totalRange > 0) {
-   this.progress = Math.round((currentProgress / totalRange) * 100);
- } else {
-   this.progress = this.currentValue >= this.targetValue ? 100 : 0;
- }
+  // Calculate progress
+  this.progress = this.calculateProgress();
 
- console.log('Progress calculation:', {
-   title: this.title,
-   currentValue: this.currentValue,
-   targetValue: this.targetValue,
-   startValue: this.startValue,
-   calculatedProgress: this.progress
- });
+  // Determine if target is met
+  const isTargetMet = this.isTargetMet();
+  const isDecreasing = this.targetValue < this.startValue;
 
- // Update status based on progress and confidence
- if (this.currentValue >= this.targetValue) {
-   this.status = 'completed';
- } else if (this.progress >= 75 && this.confidenceLevel === 'high') {
-   this.status = 'on_track';
- } else if (this.progress < 25 || this.confidenceLevel === 'low') {
-   this.status = 'at_risk';
- } else if (this.progress < 50 && this.confidenceLevel !== 'high') {
-   this.status = 'behind';
- } else {
-   this.status = 'on_track';
- }
+  console.log('Progress calculation:', {
+    title: this.title,
+    direction: isDecreasing ? 'decreasing' : 'increasing',
+    currentValue: this.currentValue,
+    targetValue: this.targetValue,
+    startValue: this.startValue,
+    calculatedProgress: this.progress,
+    targetMet: isTargetMet
+  });
 
- console.log('Status update:', {
-   title: this.title,
-   progress: this.progress,
-   confidenceLevel: this.confidenceLevel,
-   status: this.status
- });
+  // Update status based on progress and confidence
+  if (isTargetMet) {
+    this.status = 'completed';
+  } else if (this.progress >= 75 && this.confidenceLevel === 'high') {
+    this.status = 'on_track';
+  } else if (this.progress < 25 || this.confidenceLevel === 'low') {
+    this.status = 'at_risk';
+  } else if (this.progress < 50 && this.confidenceLevel !== 'high') {
+    this.status = 'behind';
+  } else {
+    this.status = 'on_track';
+  }
 
   // Track confidence changes
   if (this.isModified('confidenceLevel')) {
@@ -143,7 +164,7 @@ keyResultSchema.pre('save', async function(next) {
   next();
 });
 
-// Add method to update confidence with note
+// Method to update confidence with note
 keyResultSchema.methods.updateConfidence = async function(level, note) {
   if (!['low', 'medium', 'high'].includes(level)) {
     throw new Error('Invalid confidence level');
