@@ -80,34 +80,9 @@ router.patch('/:id', requireAuth, requireAdmin, async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
-// router.patch('/:id', requireAuth, requireAdmin, async (req, res) => {
-//   try {
-//     const updates = {};
-//     if (typeof req.body.isAdmin === 'boolean') {
-//       updates.isAdmin = req.body.isAdmin;
-//     }
-//     if (req.body.team) {
-//       updates.team = req.body.team;
-//     }
-
-//     const user = await User.findByIdAndUpdate(
-//       req.params.id,
-//       updates,
-//       { new: true }
-//     ).populate('team');
-
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-
-//     res.json(user);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// });
 
 // backend/src/routes/users.js
-router.get('/', requireAuth, requireAdmin, async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   try {
     const users = await User.find({})
       .select('-githubAccessToken')
