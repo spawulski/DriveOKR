@@ -19,7 +19,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Initialize Passport and restore authentication state if any
 app.use(passport.initialize());
-setupAuth(); // Make sure this is called AFTER passport.initialize()
+// setupAuth(); // Make sure this is called AFTER passport.initialize()
+// Pass the app instance to setupAuth
+setupAuth(app);
 
 // Routes
 app.use('/api', routes);

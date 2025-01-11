@@ -14,62 +14,45 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Explicitly start as true
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const verifyToken = async (token) => {
+    try {
+      const response = await axios.get('http://localhost:4000/api/auth/verify', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(response.data.user);
+    } catch (err) {
+      console.error('Token verification failed:', err);
+      localStorage.removeItem('token');
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let mounted = true;
-
-    const verifyToken = async () => {
-      console.log('AuthProvider - Verifying token');
-      const token = localStorage.getItem('token');
-      console.log('AuthProvider - Token exists:', !!token);
-      
-      if (!token) {
-        if (mounted) {
-          setLoading(false);
-        }
-        return;
-      }
-
-      try {
-        console.log('AuthProvider - Making verify request');
-        const response = await axios.get('http://localhost:4000/api/auth/verify', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        console.log('AuthProvider - Verify response:', response.data);
-        if (mounted) {
-          setUser(response.data.user);
-        }
-      } catch (err) {
-        console.error('AuthProvider - Token verification failed:', err);
-        localStorage.removeItem('token');
-        if (mounted) {
-          setError(err.message);
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    verifyToken();
-
-    // Cleanup function
-    return () => {
-      mounted = false;
-    };
+    const token = localStorage.getItem('token');
+    if (token) {
+      verifyToken(token);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const value = {
     user,
     loading,
     error,
-    login: () => {
+    loginWithGithub: () => {
       window.location.href = 'http://localhost:4000/api/auth/github';
     },
-    logout: () => {
+    loginWithOkta: () => {
+      // This will be handled by OKTA's own UI components
+      console.log('OKTA login triggered');
+    },
+    logout: async () => {
       localStorage.removeItem('token');
       setUser(null);
       window.location.href = '/';

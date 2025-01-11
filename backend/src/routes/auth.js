@@ -70,4 +70,26 @@ router.get('/verify',
   }
 );
 
+router.post('/okta/callback', async (req, res) => {
+  try {
+    const userData = {
+      oktaId: req.body.oktaId,
+      email: req.body.email,
+      name: req.body.name
+    };
+    
+    const user = await User.findOrCreateOktaUser(userData);
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({ token, user });
+  } catch (error) {
+    console.error('OKTA callback error:', error);
+    res.status(500).json({ error: 'Authentication failed' });
+  }
+});
+
 module.exports = router;

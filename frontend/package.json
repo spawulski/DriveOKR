@@ -13,6 +13,9 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@okta/okta-auth-js": "^7.10.0",
+    "@okta/okta-react": "^6.9.0",
+    "@okta/okta-signin-widget": "^7.27.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-tabs": "^1.0.4",
     "@tailwindcss/forms": "^0.5.9",

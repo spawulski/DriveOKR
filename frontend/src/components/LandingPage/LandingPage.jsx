@@ -14,7 +14,7 @@ import DriveOkrSS from '../../assets/Landing.png'
 
 
 const LandingPage = () => {
-  const { login } = useAuth();
+  const { loginWithGithub, loginWithOkta } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -33,14 +33,17 @@ const LandingPage = () => {
                 </p>
                 <div className="mt-10 flex items-center gap-x-6">
                   <button
-                    onClick={login}
-                    className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    onClick={loginWithGithub}
+                    className="rounded-md bg-gray-800 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-700"
                   >
-                    Get started with GitHub
+                    Sign in with GitHub
                   </button>
-                  <a href="#features" className="text-sm font-semibold leading-6 text-gray-900">
-                    Learn more <span aria-hidden="true">→</span>
-                  </a>
+                  <button
+                    onClick={loginWithOkta}
+                    className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                  >
+                    Sign in with OKTA
+                  </button>
                 </div>
               </div>
             </div>
