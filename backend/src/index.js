@@ -13,7 +13,12 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000'],  // Be explicit about allowed origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Explicitly state allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -5,13 +5,24 @@ const oktaConfig = {
   redirectUri: `${import.meta.env.VITE_OKTA_BASE_URL}/login/callback`,
   scopes: ['openid', 'profile', 'email'],
   pkce: true,
+  responseType: ['code'],
   tokenManager: {
-    storage: 'localStorage'
+    storage: 'localStorage',
+    autoRenew: true
   },
-  cookies: {
-    secure: false, // Set to true in production
-    sameSite: 'Lax'
-  }
+  restoreOriginalUri: async (oktaAuth, originalUri) => {
+    window.location.href = originalUri || '/dashboard';
+  },
+  postLogoutRedirectUri: `${import.meta.env.VITE_OKTA_BASE_URL}`,
+  devMode: process.env.NODE_ENV !== 'production' // Enable additional logging
 };
+
+// Add debug logging
+console.log('OKTA Config:', {
+  issuer: oktaConfig.issuer,
+  redirectUri: oktaConfig.redirectUri,
+  responseType: oktaConfig.responseType,
+  scopes: oktaConfig.scopes
+});
 
 export default oktaConfig;

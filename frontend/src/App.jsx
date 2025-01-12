@@ -8,7 +8,9 @@ import AuthCallback from './components/auth/AuthCallback';
 import Dashboard from './components/Dashboard/Dashboard';
 import AdminDashboard from './components/admin/AdminDashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import OktaCallback from './components/auth/OktaCallback';
+import { LoginCallback } from '@okta/okta-react';
+import OktaLoginCallback from './components/auth/OktaLoginCallback';
+
 
 const oktaAuth = new OktaAuth(oktaConfig);
 
@@ -63,12 +65,16 @@ const PublicRoute = ({ children }) => {
 
 function App() {
   const restoreOriginalUri = async (_oktaAuth, originalUri) => {
-    window.location.href = originalUri || '/';
+    // Let the callback component handle the redirect
+    return;
   };
 
   return (
     <Router>
-      <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
+      <Security 
+        oktaAuth={oktaAuth} 
+        restoreOriginalUri={restoreOriginalUri}
+      >
         <AuthProvider>
           <Routes>
             <Route 
@@ -96,7 +102,8 @@ function App() {
                 </AdminRoute>
               }
             />
-            <Route path="/login/callback" element={<OktaCallback />} />
+            {/* Single OKTA callback route using LoginCallback */}
+            <Route path="/login/callback" element={<OktaLoginCallback />} />
           </Routes>
         </AuthProvider>
       </Security>

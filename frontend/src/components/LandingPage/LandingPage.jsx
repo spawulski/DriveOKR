@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOktaLogin } from '../../hooks/useOktaLogin';
 import { 
   Target, // For Goal Alignment
   LineChart, // For Progress Tracking
@@ -14,7 +15,8 @@ import DriveOkrSS from '../../assets/Landing.png'
 
 
 const LandingPage = () => {
-  const { loginWithGithub, loginWithOkta } = useAuth();
+  const { loginWithGithub } = useAuth();
+  const { loginWithOkta } = useOktaLogin();
   const navigate = useNavigate();
 
   return (

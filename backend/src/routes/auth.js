@@ -3,6 +3,8 @@ const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
+const User = require('../models/User');
+
 
 // GitHub OAuth routes
 router.get('/github',
@@ -70,25 +72,52 @@ router.get('/verify',
   }
 );
 
+// Add some debug logging
 router.post('/okta/callback', async (req, res) => {
+  console.log('Received OKTA callback request:', req.body);
+  
   try {
-    const userData = {
-      oktaId: req.body.oktaId,
-      email: req.body.email,
-      name: req.body.name
-    };
+    const { oktaId, email, name } = req.body;
     
-    const user = await User.findOrCreateOktaUser(userData);
+    if (!oktaId || !email) {
+      console.log('Missing required fields:', { oktaId, email, name });
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    let user = await User.findOne({ oktaId });
+    console.log('Existing user:', user);
+    
+    if (!user) {
+      console.log('Creating new user with:', { oktaId, email, name });
+      user = await User.create({
+        oktaId,
+        email,
+        name,
+        authProvider: 'okta',
+        role: 'individual'
+      });
+    }
+
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
-    res.json({ token, user });
+    console.log('Generated token and sending response');
+    res.json({ 
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        isAdmin: user.role === 'admin'
+      }
+    });
   } catch (error) {
     console.error('OKTA callback error:', error);
-    res.status(500).json({ error: 'Authentication failed' });
+    res.status(500).json({ error: 'Authentication failed', details: error.message });
   }
 });
 

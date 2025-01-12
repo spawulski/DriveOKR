@@ -41,16 +41,40 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Add a function to handle setting user after OKTA login
+  const handleOktaLoginSuccess = (userData) => {
+    setUser(userData);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const handleAuthChange = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await verifyToken(token);
+      } else {
+        setLoading(false);
+      }
+    };
+
+    // Listen for auth changes
+    window.addEventListener('okta-auth-status-change', handleAuthChange);
+    
+    // Initial check
+    handleAuthChange();
+
+    return () => {
+      window.removeEventListener('okta-auth-status-change', handleAuthChange);
+    };
+  }, []);
+
   const value = {
     user,
+    setUser, // Add this
     loading,
     error,
     loginWithGithub: () => {
       window.location.href = 'http://localhost:4000/api/auth/github';
-    },
-    loginWithOkta: () => {
-      // This will be handled by OKTA's own UI components
-      console.log('OKTA login triggered');
     },
     logout: async () => {
       localStorage.removeItem('token');
