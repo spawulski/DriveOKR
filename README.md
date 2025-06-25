@@ -84,29 +84,6 @@ docker-compose up --build
    - Frontend: `http://localhost:3000`
    - Backend API: `http://localhost:4000`
 
-### Development Setup
-
-1. Install frontend dependencies:
-```bash
-cd frontend
-npm install
-```
-
-2. Install backend dependencies:
-```bash
-cd backend
-npm install
-```
-
-3. Run in development mode:
-```bash
-# In frontend directory
-npm run dev
-
-# In backend directory
-npm run dev
-```
-
 ## Project Structure
 
 ```
