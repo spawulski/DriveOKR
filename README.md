@@ -57,21 +57,14 @@ git clone https://github.com/yourusername/drive-okr.git
 cd drive-okr
 ```
 
-2. Create environment files:
+2. Create environment files from the templates and fill in real values:
 
 ```bash
-# backend/.env
-MONGODB_URI=mongodb://mongodb:27017/okr_platform
-JWT_SECRET=your_jwt_secret_here
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_client_secret
-FRONTEND_URL=http://localhost:3000
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
 
-```bash
-# frontend/.env
-VITE_API_URL=http://localhost:4000
-```
+`.env` files are git-ignored; never commit real secrets.
 
 ### Running with Docker
 

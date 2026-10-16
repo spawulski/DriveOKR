@@ -1,0 +1,9 @@
+# Local environment files (secrets). Commit *.env.example instead.
+.env
+.env.*
+!.env.example
+
+node_modules/
+dist/
+coverage/
+.DS_Store
