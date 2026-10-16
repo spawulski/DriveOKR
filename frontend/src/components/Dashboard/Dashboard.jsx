@@ -216,7 +216,7 @@ const Dashboard = () => {
                   <select
                     value={selectedQuarter}
                     onChange={(e) => setSelectedQuarter(Number(e.target.value))}
-                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="block rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   >
                     {[1, 2, 3, 4].map((quarter) => (
                       <option key={quarter} value={quarter}>Q{quarter}</option>
@@ -225,7 +225,7 @@ const Dashboard = () => {
                   <select
                     value={selectedYear}
                     onChange={(e) => setSelectedYear(Number(e.target.value))}
-                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="block rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   >
                     {[2023, 2024, 2025].map((year) => (
                       <option key={year} value={year}>{year}</option>
@@ -233,14 +233,14 @@ const Dashboard = () => {
                   </select>
                   <button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Add Objective
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white shadow overflow-hidden sm:rounded-md">
+              <div className="bg-white shadow-sm overflow-hidden sm:rounded-md">
                 <ul className="divide-y divide-gray-200">
                   {objectives.map((objective) => (
                     <li key={objective._id} className="px-6 py-4 hover:bg-gray-50">
@@ -286,7 +286,7 @@ const Dashboard = () => {
                                 e.stopPropagation();
                                 handleEditClick(objective._id);
                               }}
-                              className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              className="inline-flex items-center p-2 border border-transparent rounded-full shadow-xs text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -298,7 +298,7 @@ const Dashboard = () => {
                                   e.stopPropagation();
                                   handleDeleteClick(objective._id);
                                 }}
-                                className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                className="inline-flex items-center p-2 border border-transparent rounded-full shadow-xs text-white bg-red-600 hover:bg-red-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                   <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -349,7 +349,7 @@ const Dashboard = () => {
                                       }`}>
                                         {kr.confidenceLevel}
                                       </span>
-                                      <span className="text-gray-500 min-w-[8rem] text-right">
+                                      <span className="text-gray-500 min-w-32 text-right">
                                         {kr.currentValue} / {kr.targetValue} {kr.unit}
                                       </span>
                                     </div>
@@ -365,7 +365,7 @@ const Dashboard = () => {
                                         style={{ width: `${kr.progress}%` }}
                                       />
                                     </div>
-                                    <span className="text-xs text-gray-500 min-w-[3rem] text-right">
+                                    <span className="text-xs text-gray-500 min-w-12 text-right">
                                       {kr.progress}%
                                     </span>
                                   </div>

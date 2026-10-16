@@ -99,7 +99,7 @@ const ProgressChart = ({ keyResult }) => {
       );
 
       return (
-        <div className="bg-white p-2 border border-gray-200 rounded shadow-sm">
+        <div className="bg-white p-2 border border-gray-200 rounded-sm shadow-xs">
           <p className="text-sm">{`Date: ${new Date(currentPoint.date).toLocaleDateString()}`}</p>
           <p className="text-sm font-semibold text-indigo-600">
             {`Value: ${payload[0].value} ${keyResult.unit || ''}`}

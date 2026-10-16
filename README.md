@@ -45,7 +45,7 @@ DriveOKR is a modern, user-friendly platform for managing Objectives and Key Res
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 24 LTS (24.15.0 or newer in the 24.x line; see `.nvmrc`)
 - Docker and Docker Compose
 - GitHub OAuth credentials
 
@@ -76,6 +76,34 @@ docker-compose up --build
 2. Access the application:
    - Frontend: `http://localhost:3000`
    - Backend API: `http://localhost:4000`
+
+## Verification
+
+Use Node 24 LTS (`nvm use` if available), then install from the committed lockfiles:
+
+```bash
+(cd backend && npm ci && npm audit)
+(cd frontend && npm ci && npm audit && npm test -- --run && npm run build)
+```
+
+Backend regression tests require a disposable MongoDB server, for example:
+
+```bash
+docker run --rm -d --name driveokr-test-mongo -p 127.0.0.1:27018:27017 mongo:8.2
+cd backend
+TEST_MONGODB_URI=mongodb://127.0.0.1:27018 npm test
+# When finished:
+docker stop driveokr-test-mongo
+```
+
+The API tests start their own backend on a free port, create a randomly named
+`driveokr_test_*` database, and drop only that database on completion. They do
+not run the destructive seed script or use real GitHub OAuth credentials. The
+GitHub authorization redirect is checked, not a live GitHub sign-in.
+
+`npm run dev` in the backend uses Node's built-in watch mode; Jest and nodemon
+are no longer needed. CI repeats both audits, API and frontend tests, and the
+production build on pull requests and pushes to main.
 
 ## Project Structure
 
