@@ -20,7 +20,7 @@ const LandingPage = () => {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <div className="relative isolate overflow-hidden bg-gradient-to-b from-indigo-100/20">
+      <div className="relative isolate overflow-hidden bg-linear-to-b from-indigo-100/20">
         <div className="mx-auto max-w-7xl pb-24 pt-10 sm:pb-32 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-8 lg:py-40">
           <div className="px-6 lg:px-0 lg:pt-4">
             <div className="mx-auto max-w-2xl">
@@ -34,7 +34,7 @@ const LandingPage = () => {
                 <div className="mt-10 flex items-center gap-x-6">
                   <button
                     onClick={login}
-                    className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     Get started with GitHub
                   </button>
@@ -47,7 +47,7 @@ const LandingPage = () => {
           </div>
           <div className="mt-20 sm:mt-24 md:mx-auto md:max-w-2xl lg:mx-0 lg:mt-0 lg:w-screen">
             <div className="absolute inset-y-0 right-1/2 -z-10 overflow-hidden bg-gray-50 ring-1 ring-gray-900/10 lg:right-0">
-              <svg className="absolute inset-0 h-full w-full stroke-gray-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
+              <svg className="absolute inset-0 h-full w-full stroke-gray-200 mask-[radial-gradient(100%_100%_at_top_right,white,transparent)]" aria-hidden="true">
                 <defs>
                   <pattern id="pattern-1" width="25" height="25" x="50%" y="0" patternUnits="userSpaceOnUse">
                     <path d="M.5 200V.5H200" fill="none" />

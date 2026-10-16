@@ -110,7 +110,7 @@ const TeamManager = () => {
   return (
     <div className="space-y-6">
       {/* Create Team Form */}
-      <div className="bg-white p-6 rounded-lg shadow">
+      <div className="bg-white p-6 rounded-lg shadow-sm">
         <h3 className="text-lg font-medium mb-4">Create New Team</h3>
         <form onSubmit={handleCreateTeam} className="space-y-4">
           <div>
@@ -120,7 +120,7 @@ const TeamManager = () => {
                 type="text"
                 value={newTeam.name}
                 onChange={(e) => setNewTeam({...newTeam, name: e.target.value})}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                 required
               />
             </label>
@@ -131,7 +131,7 @@ const TeamManager = () => {
               <select
                 value={newTeam.department}
                 onChange={(e) => setNewTeam({...newTeam, department: e.target.value})}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                 required
               >
                 <option value="">Select Department</option>
@@ -145,7 +145,7 @@ const TeamManager = () => {
           </div>
           <button
             type="submit"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-xs text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Create Team
           </button>
@@ -153,7 +153,7 @@ const TeamManager = () => {
       </div>
 
       {/* Teams List */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
+      <div className="bg-white shadow-sm overflow-hidden sm:rounded-md">
         <ul className="divide-y divide-gray-200">
           {teams.map((team) => (
             <li key={team._id} className="px-6 py-4">
@@ -169,7 +169,7 @@ const TeamManager = () => {
                   <select
                     value={team.teamLead?._id || ''}
                     onChange={(e) => handleUpdateTeamLead(team._id, e.target.value)}
-                    className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   >
                     <option value="">Select Team Lead</option>
                     {users
@@ -193,7 +193,7 @@ const TeamManager = () => {
                     onChange={(e) => handleUpdateMembers(team._id, 
                       Array.from(e.target.selectedOptions, option => option.value)
                     )}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 min-h-[200px]" // Added min-height for better visibility
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500 min-h-[200px]" // Added min-height for better visibility
                   >
                     {users
                       .filter(user => 

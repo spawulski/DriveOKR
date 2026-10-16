@@ -126,7 +126,7 @@ const fetchData = async () => {
                     <select
                       value={user.team?._id || ''}
                       onChange={(e) => handleTeamChange(user._id, e.target.value)}
-                      className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     >
                       <option value="">No Team</option>
                       {teams.map((team) => (

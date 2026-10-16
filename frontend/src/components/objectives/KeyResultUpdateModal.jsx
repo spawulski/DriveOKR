@@ -133,7 +133,7 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </label>
               </div>
@@ -144,7 +144,7 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     rows="3"
                   />
                 </label>
@@ -157,7 +157,7 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
                     <select
                       value={formData.metricType}
                       onChange={(e) => setFormData({ ...formData, metricType: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     >
                       <option value="number">Number</option>
                       <option value="percentage">Percentage</option>
@@ -174,7 +174,7 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
                       type="text"
                       value={formData.unit}
                       onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                       placeholder="e.g., users, $, %"
                     />
                   </label>
@@ -190,7 +190,7 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
                       required
                       value={formData.startValue}
                       onChange={(e) => setFormData({ ...formData, startValue: Number(e.target.value) })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     />
                   </label>
                 </div>
@@ -203,7 +203,7 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
                       required
                       value={formData.targetValue}
                       onChange={(e) => setFormData({ ...formData, targetValue: Number(e.target.value) })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     />
                   </label>
                 </div>
@@ -220,7 +220,7 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
                   required
                   value={formData.currentValue}
                   onChange={(e) => setFormData({ ...formData, currentValue: Number(e.target.value) })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                 />
               </label>
             </div>
@@ -231,7 +231,7 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
                 <select
                   value={formData.confidenceLevel}
                   onChange={(e) => setFormData({ ...formData, confidenceLevel: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -251,14 +251,14 @@ const KeyResultUpdateModal = ({ isOpen, onClose, keyResult, objectiveId, updateO
             <button
               type="button"
               onClick={() => onClose()}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-xs text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>

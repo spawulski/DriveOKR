@@ -73,7 +73,7 @@ const DepartmentManager = () => {
  return (
    <div className="space-y-6">
      {/* Create Department Form */}
-     <div className="bg-white p-6 rounded-lg shadow">
+     <div className="bg-white p-6 rounded-lg shadow-sm">
        <h3 className="text-lg font-medium mb-4">Create New Department</h3>
        <form onSubmit={handleCreateDepartment} className="space-y-4">
          <div>
@@ -83,7 +83,7 @@ const DepartmentManager = () => {
                type="text"
                value={newDepartment.name}
                onChange={(e) => setNewDepartment({...newDepartment, name: e.target.value})}
-               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+               className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                required
              />
            </label>
@@ -94,13 +94,13 @@ const DepartmentManager = () => {
              <textarea
                value={newDepartment.description}
                onChange={(e) => setNewDepartment({...newDepartment, description: e.target.value})}
-               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+               className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
              />
            </label>
          </div>
          <button
            type="submit"
-           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-xs text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
          >
            Create Department
          </button>
@@ -108,7 +108,7 @@ const DepartmentManager = () => {
      </div>
 
      {/* Departments List */}
-     <div className="bg-white shadow overflow-hidden sm:rounded-md">
+     <div className="bg-white shadow-sm overflow-hidden sm:rounded-md">
        <ul className="divide-y divide-gray-200">
          {departments.map((department) => (
            <li key={department._id} className="px-6 py-4">
@@ -122,7 +122,7 @@ const DepartmentManager = () => {
                  <select
                    value={department.manager?._id || ''}
                    onChange={(e) => handleUpdateManager(department._id, e.target.value)}
-                   className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                   className="rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                  >
                    <option value="">Select Manager</option>
                    {users.map((user) => (

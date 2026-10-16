@@ -1,0 +1,55 @@
+name: Dependency and regression checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:8.2
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      - name: Backend clean install
+        run: npm ci
+        working-directory: backend
+      - name: Backend audit (including dev dependencies)
+        run: npm audit
+        working-directory: backend
+      - name: API regression tests
+        run: npm test
+        working-directory: backend
+        env:
+          TEST_MONGODB_URI: mongodb://127.0.0.1:27017
+      - name: Frontend clean install
+        run: npm ci
+        working-directory: frontend
+      - name: Frontend audit (including dev dependencies)
+        run: npm audit
+        working-directory: frontend
+      - name: Frontend regression tests
+        run: npm test -- --run
+        working-directory: frontend
+      - name: Production build
+        run: npm run build
+        working-directory: frontend

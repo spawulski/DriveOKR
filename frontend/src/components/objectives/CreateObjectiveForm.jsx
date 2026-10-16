@@ -63,7 +63,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     required
                   >
                     <option value="">Select Department</option>
@@ -81,7 +81,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                   <select
                     value={formData.team}
                     onChange={(e) => setFormData({ ...formData, team: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     required
                   >
                     <option value="">Select Team</option>
@@ -101,7 +101,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                 <select
                   value={formData.owner}
                   onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   required
                 >
                   <option value="">Select User</option>
@@ -133,7 +133,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     required
                   >
                     <option value="">Select Department</option>
@@ -151,7 +151,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                   <select
                     value={formData.team}
                     onChange={(e) => setFormData({ ...formData, team: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     required
                   >
                     <option value="">Select Team</option>
@@ -171,7 +171,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                 <select
                   value={formData.owner}
                   onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   required
                 >
                   <option value="">Select User</option>
@@ -203,7 +203,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                   <select
                     value={formData.department}
                     onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     required
                   >
                     <option value="">Select Department</option>
@@ -221,7 +221,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                   <select
                     value={formData.team}
                     onChange={(e) => setFormData({ ...formData, team: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                     required
                   >
                     <option value="">Select Team</option>
@@ -241,7 +241,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                 <select
                   value={formData.owner}
                   onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   required
                 >
                   <option value="">Select User</option>
@@ -277,7 +277,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                         team: '',  // Reset team when department changes
                         owner: ''  // Reset owner when department changes
                       })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                       required
                     >
                       <option value="">Select Department</option>
@@ -301,7 +301,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                           team: e.target.value,
                           owner: ''  // Reset owner when team changes
                         })}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                         required
                       >
                         <option value="">Select Team</option>
@@ -324,7 +324,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                 <select
                   value={formData.owner}
                   onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   required
                 >
                   <option value="">Select User</option>
@@ -497,7 +497,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                 />
               </label>
             </div>
@@ -508,7 +508,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   rows="3"
                 />
               </label>
@@ -526,7 +526,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                       department: '',
                       team: ''
                     })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   >
                     <option value="individual">Individual</option>
                     <option value="team">Team</option>
@@ -549,7 +549,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                       ...formData,
                       timeframe: { ...formData.timeframe, quarter: Number(e.target.value) }
                     })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   >
                     {[1, 2, 3, 4].map((q) => (
                       <option key={q} value={q}>Q{q}</option>
@@ -567,7 +567,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                       ...formData,
                       timeframe: { ...formData.timeframe, year: Number(e.target.value) }
                     })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                   >
                     {[2023, 2024, 2025].map((year) => (
                       <option key={year} value={year}>{year}</option>
@@ -607,7 +607,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                           required
                           value={kr.title}
                           onChange={(e) => handleKeyResultChange(index, 'title', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                         />
                       </label>
                     </div>
@@ -618,7 +618,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                         <textarea
                           value={kr.description}
                           onChange={(e) => handleKeyResultChange(index, 'description', e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                           rows="2"
                         />
                       </label>
@@ -631,7 +631,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                           <select
                             value={kr.metricType}
                             onChange={(e) => handleKeyResultChange(index, 'metricType', e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                           >
                             <option value="number">Number</option>
                             <option value="percentage">Percentage</option>
@@ -648,7 +648,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                             type="text"
                             value={kr.unit}
                             onChange={(e) => handleKeyResultChange(index, 'unit', e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="e.g., users, $, %"
                           />
                         </label>
@@ -664,7 +664,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                             required
                             value={kr.startValue}
                             onChange={(e) => handleKeyResultChange(index, 'startValue', Number(e.target.value))}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                           />
                         </label>
                       </div>
@@ -677,7 +677,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                             required
                             value={kr.targetValue}
                             onChange={(e) => handleKeyResultChange(index, 'targetValue', Number(e.target.value))}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                           />
                         </label>
                       </div>
@@ -688,7 +688,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
                           <select
                             value={kr.confidenceLevel}
                             onChange={(e) => handleKeyResultChange(index, 'confidenceLevel', e.target.value)}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
                           >
                             <option value="low">Low</option>
                             <option value="medium">Medium</option>
@@ -708,7 +708,7 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
             <button
               type="button"
               onClick={handleAddKeyResult}
-              className="inline-flex items-center px-4 py-2 border border-indigo-500 text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="inline-flex items-center px-4 py-2 border border-indigo-500 text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -731,14 +731,14 @@ const CreateObjectiveForm = ({ isOpen, onClose, onObjectiveCreated }) => {
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-xs text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !isFormValid()}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               {loading ? 'Creating...' : 'Create Objective'}
             </button>

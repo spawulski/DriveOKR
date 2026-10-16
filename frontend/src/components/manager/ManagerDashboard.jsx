@@ -63,7 +63,7 @@ const ManagerDashboard = () => {
       </div>
 
       {/* Team Members Section */}
-      <div className="bg-white shadow rounded-lg mb-8">
+      <div className="bg-white shadow-sm rounded-lg mb-8">
         <div className="px-4 py-5 sm:p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
             {user.role === 'team_lead' ? 'Team Members' : 'Department Members'}
@@ -80,13 +80,13 @@ const ManagerDashboard = () => {
       </div>
 
       {/* Team OKRs Section */}
-      <div className="bg-white shadow rounded-lg">
+      <div className="bg-white shadow-sm rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-medium text-gray-900">Team OKRs</h2>
             <button
               onClick={() => {/* Add handler for creating team OKR */}}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-indigo-600 hover:bg-indigo-700"
             >
               Add Team OKR
             </button>
