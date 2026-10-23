@@ -1,7 +1,8 @@
 // frontend/src/components/LandingPage/LandingPage.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { authErrorMessage } from '../auth/authErrors';
 import { 
   Target, // For Goal Alignment
   LineChart, // For Progress Tracking
@@ -16,6 +17,8 @@ import DriveOkrSS from '../../assets/Landing.png'
 const LandingPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const authError = searchParams.get('auth_error');
 
   return (
     <div className="bg-white">
@@ -31,12 +34,23 @@ const LandingPage = () => {
                 <p className="mt-6 text-lg leading-8 text-gray-600">
                   Align your organization, track progress, and achieve your objectives with DriveOKR. The modern platform for goal setting and performance management.
                 </p>
+                {authError && (
+                  <div role="alert" className="mt-6 rounded-md bg-red-50 p-3 text-sm text-red-700">
+                    {authErrorMessage(authError)}
+                  </div>
+                )}
                 <div className="mt-10 flex items-center gap-x-6">
                   <button
-                    onClick={login}
+                    onClick={() => login('github')}
                     className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     Get started with GitHub
+                  </button>
+                  <button
+                    onClick={() => login('google')}
+                    className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Sign in with Google
                   </button>
                   <a href="#features" className="text-sm font-semibold leading-6 text-gray-900">
                     Learn more <span aria-hidden="true">→</span>
