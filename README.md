@@ -96,7 +96,9 @@ GitHub sign-in works as before.
 
    `BACKEND_URL` and `FRONTEND_URL` must be bare http(s) origins. The OAuth
    callback and all post-login redirects are derived from them, never from the
-   request.
+   request. `BACKEND_URL` must match the origin used to start sign-in in the
+   frontend, currently hardcoded to `http://localhost:4000`; using a different
+   origin requires configuring the frontend API URLs consistently as well.
 
 How it works and security notes:
 
