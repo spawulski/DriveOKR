@@ -1,6 +1,10 @@
 // frontend/src/contexts/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { navigateTo } from '../utils/navigation';
+
+// Sign-in providers served by the backend at /api/auth/<provider>.
+const AUTH_PROVIDERS = ['github', 'google'];
 
 const AuthContext = createContext(null);
 
@@ -66,8 +70,11 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     error,
-    login: () => {
-      window.location.href = 'http://localhost:4000/api/auth/github';
+    login: (provider = 'github') => {
+      if (!AUTH_PROVIDERS.includes(provider)) {
+        throw new Error(`Unknown sign-in provider: ${provider}`);
+      }
+      navigateTo(`http://localhost:4000/api/auth/${provider}`);
     },
     logout: () => {
       localStorage.removeItem('token');

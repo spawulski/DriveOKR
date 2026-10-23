@@ -13,7 +13,7 @@ const AuthCallback = () => {
     
     if (error) {
       console.error('Auth error:', error);
-      navigate('/login');
+      navigate(`/?auth_error=${encodeURIComponent(error)}`, { replace: true });
       return;
     }
 
@@ -22,7 +22,7 @@ const AuthCallback = () => {
       navigate('/dashboard');
     } else {
       console.error('No token received');
-      navigate('/login');
+      navigate('/?auth_error=no_token', { replace: true });
     }
   }, [navigate, location]);
 

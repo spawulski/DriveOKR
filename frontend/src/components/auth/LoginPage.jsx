@@ -14,9 +14,8 @@ const LoginPage = () => {
     }
   }, [user, navigate]);
 
-  const handleGitHubLogin = () => {
-    window.location.href = 'http://localhost:4000/api/auth/github';
-  };
+  const handleGitHubLogin = () => login('github');
+  const handleGoogleLogin = () => login('google');
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -32,6 +31,12 @@ const LoginPage = () => {
             className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-900"
           >
             Sign in with GitHub
+          </button>
+          <button
+            onClick={handleGoogleLogin}
+            className="mt-3 w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
+          >
+            Sign in with Google
           </button>
         </div>
       </div>
